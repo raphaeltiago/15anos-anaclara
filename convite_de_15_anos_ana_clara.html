@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15 Anos - Ana Clara | Convite Real</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fontes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            purple: '#9370DB',        /* Medium Purple solicitado */
+                            purpleLight: '#B095E6',
+                            purpleDark: '#2A123D',    /* Deep Plum */
+                            night: '#13091E',
+                            champagne: '#F7E7CE',
+                            gold: '#F3E5AB',
+                            goldAccent: '#D4AF37'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        script: ['Great Vibes', 'cursive'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #13091E;
+            color: #F7E7CE;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Gradient Text */
+        .text-purple-gradient {
+            background: linear-gradient(135deg, #F7E7CE 0%, #9370DB 50%, #F3E5AB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #FFF5D6 0%, #D4AF37 50%, #F3E5AB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-purple {
+            background: rgba(42, 18, 61, 0.85);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(147, 112, 219, 0.35);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-alert {
+            background: rgba(147, 112, 219, 0.15);
+            border: 1px solid rgba(147, 112, 219, 0.5);
+        }
+
+        /* Envelope Motion */
+        .envelope-flap {
+            clip-path: polygon(0 0, 50% 50%, 100% 0);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top;
+        }
+
+        .envelope-open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        /* Button Styling */
+        .btn-purple {
+            background: linear-gradient(135deg, #9370DB 0%, #7B52C4 100%);
+            color: #FFFFFF;
+            box-shadow: 0 4px 18px rgba(147, 112, 219, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(147, 112, 219, 0.6);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #B88E14 100%);
+            color: #13091E;
+            box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.55);
+        }
+
+        /* Glowing Animations */
+        @keyframes sunGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(147, 112, 219, 0.6), 0 0 40px rgba(243, 229, 171, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(147, 112, 219, 0.9), 0 0 60px rgba(243, 229, 171, 0.7); }
+        }
+
+        .wax-seal-glow {
+            animation: sunGlow 2.5s infinite ease-in-out;
+        }
+
+        /* Background Canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-[#9370DB] selection:text-white">
+
+    <!-- Canvas de Fundo (Lanternas Flutuantes & Estrelas) -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Topo: Player de Áudio -->
+    <header class="relative z-20 w-full p-4 flex justify-between items-center max-w-3xl mx-auto">
+        <button id="audioToggleBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-4 py-2 rounded-full glass-purple text-xs text-[#F7E7CE] hover:text-white transition">
+            <i id="audioIcon" class="fas fa-music text-[#9370DB]"></i>
+            <span id="audioText">Música: Pausada</span>
+        </button>
+        <span class="font-cinzel text-xs tracking-widest text-[#9370DB] font-semibold">REINO DE CORONA</span>
+    </header>
+
+    <audio id="bgAudio" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=orchestral-fantasy-112022.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. ENVELOPE DE CORONA (ENTRADA IMPACTANTE ESTILO TIKTOK) -->
+    <div id="envelopeScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#13091E]/95 backdrop-blur-lg transition-all duration-700">
+        <div id="envelopeBox" class="max-w-sm w-full glass-purple rounded-3xl p-8 text-center relative border border-[#9370DB]/40 shadow-2xl overflow-hidden">
+            
+            <!-- Sol de Corona -->
+            <div class="text-[#9370DB] text-4xl mb-3 flex justify-center">
+                <i class="fas fa-sun animate-spin-slow"></i>
+            </div>
+            
+            <p class="font-cinzel text-[11px] tracking-[0.35em] text-[#9370DB] uppercase mb-1 font-bold">Convite Real</p>
+            <h1 class="font-script text-5xl text-[#F7E7CE] mb-2">Ana Clara</h1>
+            <p class="font-cinzel text-xs tracking-widest text-[#F3E5AB] mb-8">MEUS 15 ANOS</p>
+            
+            <p class="text-xs text-[#F7E7CE]/80 mb-8 leading-relaxed font-light">
+                Toque no Selo Sol de Corona para abrir a mensagem encantada.
+            </p>
+
+            <!-- Selo de Cera do Sol -->
+            <button onclick="openEnvelope()" class="wax-seal-glow group inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-tr from-[#9370DB] via-[#B095E6] to-[#F3E5AB] text-[#13091E] font-bold border-2 border-[#F3E5AB] transition transform hover:scale-105 active:scale-95">
+                <div class="flex flex-col items-center">
+                    <i class="fas fa-crown text-2xl text-[#13091E] group-hover:rotate-12 transition"></i>
+                    <span class="font-cinzel text-[9px] font-extrabold tracking-wider uppercase text-[#13091E] mt-0.5">ABRIR</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. CENA ANIMADA DA RAPUNZEL E LANTERNAS (MODAL DE ABORDAGEM) -->
+    <div id="rapunzelSceneModal" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-opacity">
+        <div class="max-w-xl w-full glass-purple rounded-3xl p-6 text-center space-y-5 border border-[#9370DB]/50 relative overflow-hidden">
+            
+            <div class="flex justify-between items-center px-2">
+                <span class="font-cinzel text-xs tracking-widest text-[#9370DB] uppercase font-semibold">
+                    <i class="fas fa-sparkles mr-1"></i> Vejo Enfim a Luz Brilhar
+                </span>
+                <button onclick="closeRapunzelScene()" class="text-xs text-[#F7E7CE]/70 hover:text-white px-3 py-1 rounded-full bg-[#2A123D] border border-[#9370DB]/30">
+                    Pular <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+
+            <!-- Canvas da Cena da Rapunzel -->
+            <div class="relative w-full h-72 rounded-2xl overflow-hidden border border-[#9370DB]/40 bg-gradient-to-b from-[#13091E] via-[#2A123D] to-[#3d1c47]">
+                <canvas id="sceneCanvas" class="w-full h-full"></canvas>
+                
+                <!-- Silhueta Vetorial Elegante da Rapunzel -->
+                <div class="absolute bottom-0 right-8 w-28 h-auto pointer-events-none opacity-90">
+                    <svg viewBox="0 0 100 140" fill="#13091E">
+                        <path d="M50 15 C45 15 40 20 40 25 C40 32 45 36 50 36 C55 36 60 32 60 25 C60 20 55 15 50 15 Z M42 36 L30 65 L15 140 L85 140 L70 65 L58 36 Z"/>
+                    </svg>
+                </div>
+                
+                <!-- Mensagem na cena -->
+                <div class="absolute top-4 left-4 right-4 text-left pointer-events-none">
+                    <p class="font-script text-2xl text-[#F3E5AB]">"O mundo parece ser novo..."</p>
+                </div>
+            </div>
+
+            <button onclick="closeRapunzelScene()" class="w-full py-3.5 rounded-xl btn-purple font-cinzel font-bold text-xs uppercase tracking-widest">
+                Entrar no Convite <i class="fas fa-chevron-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. CONTEÚDO PRINCIPAL DO CONVITE -->
+    <main class="relative z-10 flex-1 max-w-2xl w-full mx-auto px-4 py-8 space-y-8">
+
+        <!-- CABEÇALHO -->
+        <section class="text-center space-y-3 pt-2">
+            <div class="inline-flex items-center justify-center space-x-3 text-[#9370DB]">
+                <span class="h-px w-10 bg-gradient-to-r from-transparent to-[#9370DB]"></span>
+                <i class="fas fa-crown text-xs"></i>
+                <span class="h-px w-10 bg-gradient-to-l from-transparent to-[#9370DB]"></span>
+            </div>
+
+            <p class="font-cinzel text-xs tracking-[0.3em] text-[#9370DB] uppercase font-semibold">15º Aniversário</p>
+            <h1 class="font-script text-6xl md:text-7xl text-purple-gradient py-1">Ana Clara</h1>
+            
+            <p class="font-cinzel text-sm text-[#F7E7CE] tracking-widest font-semibold">
+                DOMINGO, 15 DE NOVEMBRO DE 2026
+            </p>
+            <p class="text-xs text-[#9370DB] font-medium">Recepção às 19:30h</p>
+        </section>
+
+        <!-- CONTAGEM REGRESSIVA -->
+        <section class="glass-purple rounded-2xl p-6 text-center">
+            <h2 class="font-cinzel text-xs uppercase tracking-widest text-[#9370DB] mb-4 font-bold">Contagem Regressiva</h2>
+            <div class="grid grid-cols-4 gap-3 max-w-sm mx-auto">
+                <div class="p-3 bg-[#13091E]/70 rounded-xl border border-[#9370DB]/30">
+                    <span id="days" class="block font-cinzel text-2xl font-bold text-[#F3E5AB]">00</span>
+                    <span class="text-[9px] uppercase text-[#F7E7CE]/70 tracking-wider">Dias</span>
+                </div>
+                <div class="p-3 bg-[#13091E]/70 rounded-xl border border-[#9370DB]/30">
+                    <span id="hours" class="block font-cinzel text-2xl font-bold text-[#F3E5AB]">00</span>
+                    <span class="text-[9px] uppercase text-[#F7E7CE]/70 tracking-wider">Horas</span>
+                </div>
+                <div class="p-3 bg-[#13091E]/70 rounded-xl border border-[#9370DB]/30">
+                    <span id="minutes" class="block font-cinzel text-2xl font-bold text-[#F3E5AB]">00</span>
+                    <span class="text-[9px] uppercase text-[#F7E7CE]/70 tracking-wider">Min</span>
+                </div>
+                <div class="p-3 bg-[#13091E]/70 rounded-xl border border-[#9370DB]/30">
+                    <span id="seconds" class="block font-cinzel text-2xl font-bold text-[#F3E5AB]">00</span>
+                    <span class="text-[9px] uppercase text-[#F7E7CE]/70 tracking-wider">Seg</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- DRESS CODE (AVISO DO ROXO #9370DB / LILÁS) -->
+        <section class="glass-purple rounded-2xl p-6 text-center space-y-4">
+            <div class="w-10 h-10 rounded-full bg-[#9370DB]/20 border border-[#9370DB]/40 flex items-center justify-center mx-auto text-[#9370DB]">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            
+            <div>
+                <h2 class="font-cinzel text-base font-semibold text-[#F7E7CE]">Traje Recomendado</h2>
+                <p class="text-xs text-[#F3E5AB] mt-1 font-medium">Esporte Fino / Gala</p>
+            </div>
+
+            <!-- Aviso em Destaque Especial -->
+            <div class="glass-alert p-4 rounded-xl text-left max-w-md mx-auto flex items-start gap-3">
+                <i class="fas fa-exclamation-triangle text-[#9370DB] text-lg mt-0.5"></i>
+                <div class="text-xs text-[#F7E7CE] leading-relaxed">
+                    <strong class="text-[#9370DB] font-semibold block mb-0.5">Aviso Importante aos Convidados:</strong>
+                    Pedimos gentilmente que <span class="text-[#9370DB] font-bold underline">não utilizem trajes nas cores Roxo (#9370DB) ou Lilás</span>, pois estas cores são de uso exclusivo da debutante Ana Clara.
+                </div>
+            </div>
+        </section>
+
+        <!-- LOCALIZAÇÃO -->
+        <section class="glass-purple rounded-2xl p-6 space-y-5 text-center">
+            <div class="w-10 h-10 rounded-full bg-[#9370DB]/20 border border-[#9370DB]/40 flex items-center justify-center mx-auto text-[#9370DB]">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            
+            <div>
+                <h2 class="font-cinzel text-base font-semibold text-[#F7E7CE]">Local da Festa</h2>
+                <p class="text-sm font-medium text-[#F3E5AB] mt-1">Maison Royale Eventos</p>
+                <p class="text-xs text-[#F7E7CE]/70 mt-0.5">Av. Das Lanternas, 1000 - Salão Imperial</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-3 pt-1 max-w-md mx-auto">
+                <a href="https://maps.google.com/?q=Maison+Royale+Eventos" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 py-3 px-4 rounded-xl bg-[#13091E] border border-[#9370DB]/40 text-[#F7E7CE] text-xs font-semibold hover:border-[#9370DB] transition flex items-center justify-center gap-2">
+                    <i class="fas fa-map-marked-alt text-[#9370DB]"></i> Google Maps
+                </a>
+                <a href="https://waze.com/ul?q=Maison+Royale+Eventos" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 py-3 px-4 rounded-xl bg-[#13091E] border border-[#9370DB]/40 text-[#F7E7CE] text-xs font-semibold hover:border-[#9370DB] transition flex items-center justify-center gap-2">
+                    <i class="fab fa-waze text-[#9370DB]"></i> Waze
+                </a>
+            </div>
+        </section>
+
+        <!-- RSVP (CONFIRMAÇÃO DE PRESENÇA) -->
+        <section class="glass-purple rounded-2xl p-6 space-y-5">
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 rounded-full bg-[#9370DB]/20 border border-[#9370DB]/40 flex items-center justify-center mx-auto text-[#9370DB] mb-2">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h2 class="font-cinzel text-base font-semibold text-[#F7E7CE]">Confirmação de Presença</h2>
+                <p class="text-xs text-[#F7E7CE]/70">Por favor, confirme sua presença até 01/11/2026.</p>
+            </div>
+
+            <form id="rsvpForm" onsubmit="submitRSVP(event)" class="space-y-4 max-w-md mx-auto">
+                <div>
+                    <label class="block text-xs font-medium text-[#F7E7CE] mb-1">Nome Completo *</label>
+                    <input type="text" id="rsvpName" required placeholder="Digite seu nome" 
+                           class="w-full px-4 py-2.5 rounded-xl bg-[#13091E]/80 border border-[#9370DB]/40 text-[#F7E7CE] placeholder-[#F7E7CE]/30 text-xs focus:outline-none focus:border-[#9370DB]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-[#F7E7CE] mb-1">Você comparecerá? *</label>
+                    <select id="rsvpAttendance" required class="w-full px-4 py-2.5 rounded-xl bg-[#13091E]/80 border border-[#9370DB]/40 text-[#F7E7CE] text-xs focus:outline-none focus:border-[#9370DB]">
+                        <option value="Sim">Sim, estarei presente com certeza!</option>
+                        <option value="Não">Infelizmente não poderei ir</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-[#F7E7CE] mb-1">Acompanhantes</label>
+                    <input type="number" id="rsvpGuests" min="0" max="5" value="0" 
+                           class="w-full px-4 py-2.5 rounded-xl bg-[#13091E]/80 border border-[#9370DB]/40 text-[#F7E7CE] text-xs focus:outline-none focus:border-[#9370DB]">
+                </div>
+
+                <button type="submit" id="rsvpSubmitBtn" class="w-full py-3.5 rounded-xl btn-purple font-cinzel font-bold text-xs uppercase tracking-widest mt-2">
+                    Confirmar Presença
+                </button>
+            </form>
+
+            <div id="rsvpFeedback" class="hidden text-center p-4 rounded-xl bg-[#13091E]/90 border border-[#9370DB] text-xs text-[#F7E7CE]"></div>
+        </section>
+
+    </main>
+
+    <footer class="relative z-10 text-center py-6 text-[11px] text-[#9370DB]/80">
+        15 Anos • Ana Clara • Reino de Corona
+    </footer>
+
+    <script>
+        const targetPartyDate = new Date('2026-11-15T19:30:00').getTime();
+
+        window.onload = function() {
+            initBackgroundCanvas();
+            initSceneCanvas();
+            initCountdown();
+        };
+
+        /* Envelope / Opening Flow */
+        function openEnvelope() {
+            const env = document.getElementById('envelopeScreen');
+            env.classList.add('opacity-0');
+            setTimeout(() => {
+                env.style.display = 'none';
+                document.getElementById('rapunzelSceneModal').classList.remove('hidden');
+            }, 700);
+
+            // Tenta dar play no áudio
+            const audio = document.getElementById('bgAudio');
+            audio.play().then(() => updateAudioUI(true)).catch(() => updateAudioUI(false));
+        }
+
+        function closeRapunzelScene() {
+            document.getElementById('rapunzelSceneModal').classList.add('hidden');
+        }
+
+        /* Audio Player Toggle */
+        function toggleAudio() {
+            const audio = document.getElementById('bgAudio');
+            if (audio.paused) {
+                audio.play();
+                updateAudioUI(true);
+            } else {
+                audio.pause();
+                updateAudioUI(false);
+            }
+        }
+
+        function updateAudioUI(isPlaying) {
+            const txt = document.getElementById('audioText');
+            const icon = document.getElementById('audioIcon');
+            if (isPlaying) {
+                txt.innerText = "Música: Tocando";
+                icon.className = "fas fa-volume-up text-[#9370DB] animate-pulse";
+            } else {
+                txt.innerText = "Música: Pausada";
+                icon.className = "fas fa-music text-[#9370DB]";
+            }
+        }
+
+        /* Countdown */
+        function initCountdown() {
+            const timer = () => {
+                const now = new Date().getTime();
+                const dist = targetPartyDate - now;
+
+                if (dist < 0) return;
+
+                const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((dist % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = String(d).padStart(2, '0');
+                document.getElementById('hours').innerText = String(h).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(m).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(s).padStart(2, '0');
+            };
+            timer();
+            setInterval(timer, 1000);
+        }
+
+        /* Background Canvas Floating Lanterns */
+        function initBackgroundCanvas() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const lanterns = [];
+            const count = Math.min(25, Math.floor(window.innerWidth / 30));
+
+            for (let i = 0; i < count; i++) {
+                lanterns.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 9 + 6,
+                    speedY: Math.random() * 0.4 + 0.15,
+                    opacity: Math.random() * 0.5 + 0.25
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                lanterns.forEach(l => {
+                    l.y -= l.speedY;
+                    l.x += Math.sin(l.y * 0.01) * 0.2;
+
+                    if (l.y < -30) {
+                        l.y = canvas.height + 30;
+                        l.x = Math.random() * canvas.width;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = l.opacity;
+                    
+                    // Glow radial
+                    const rad = ctx.createRadialGradient(l.x, l.y, 1, l.x, l.y, l.size * 1.6);
+                    rad.addColorStop(0, 'rgba(243, 229, 171, 0.9)');
+                    rad.addColorStop(0.5, 'rgba(147, 112, 219, 0.4)');
+                    rad.addColorStop(1, 'rgba(147, 112, 219, 0)');
+                    ctx.fillStyle = rad;
+                    ctx.beginPath();
+                    ctx.arc(l.x, l.y, l.size * 1.6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Lantern Body
+                    ctx.fillStyle = '#F3E5AB';
+                    ctx.beginPath();
+                    ctx.roundRect(l.x - l.size/2, l.y - l.size*0.6, l.size, l.size*1.2, 3);
+                    ctx.fill();
+
+                    ctx.restore();
+                });
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        /* Scene Canvas Animation (Rapunzel Modal) */
+        function initSceneCanvas() {
+            const canvas = document.getElementById('sceneCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resize();
+
+            const sceneLanterns = [];
+            for (let i = 0; i < 18; i++) {
+                sceneLanterns.push({
+                    x: Math.random() * 400,
+                    y: Math.random() * 300,
+                    size: Math.random() * 7 + 4,
+                    speed: Math.random() * 0.5 + 0.2
+                });
+            }
+
+            function drawScene() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                sceneLanterns.forEach(l => {
+                    l.y -= l.speed;
+                    if (l.y < -10) l.y = canvas.height + 10;
+
+                    ctx.save();
+                    ctx.fillStyle = '#F3E5AB';
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = '#9370DB';
+                    ctx.beginPath();
+                    ctx.arc(l.x, l.y, l.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+
+                requestAnimationFrame(drawScene);
+            }
+            drawScene();
+        }
+
+        /* RSVP Submission */
+        function submitRSVP(e) {
+            e.preventDefault();
+            const btn = document.getElementById('rsvpSubmitBtn');
+            const feedback = document.getElementById('rsvpFeedback');
+            const name = document.getElementById('rsvpName').value;
+
+            btn.disabled = true;
+            btn.innerText = "Enviando...";
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerText = "Confirmar Presença";
+                feedback.classList.remove('hidden');
+                feedback.innerHTML = `
+                    <i class="fas fa-check-circle text-[#9370DB] text-lg mb-1 block"></i>
+                    <strong class="text-[#F3E5AB]">Presença Confirmada!</strong>
+                    <p class="mt-1 font-light">Obrigado, ${name}! Esperamos por você na celebração dos 15 anos da Ana Clara.</p>
+                `;
+                document.getElementById('rsvpForm').reset();
+            }, 600);
+        }
+    </script>
+</body>
+</html>
