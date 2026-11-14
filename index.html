@@ -164,6 +164,11 @@
     #rapunzelModal.active {
       display: flex;
     }
+    #rapunzelModal.leaving {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.65s ease;
+    }
 
     .scene-box {
       width: 100%;
@@ -420,7 +425,6 @@
     <p class="scene-caption" id="sceneCaption">Toque em "Soltar Lanterna" para ver a Rapunzel enviar a luz ao céu.</p>
     <div class="scene-actions">
       <button type="button" class="btn-primary" id="releaseBtn">Soltar Lanterna</button>
-      <button type="button" class="btn-secondary" id="enterBtn">Entrar no Convite</button>
     </div>
   </section>
 
@@ -587,11 +591,19 @@
       }
 
       function enterInvitation() {
+        if (rapunzelState.entering) return;
+        rapunzelState.entering = true;
         const cover = document.getElementById('coverScreen');
         const modal = document.getElementById('rapunzelModal');
         if (cover) cover.classList.add('hidden');
-        if (modal) modal.classList.remove('active');
-        startRapunzelMusic();
+        if (modal) modal.classList.add('leaving');
+        setTimeout(() => {
+          if (modal) {
+            modal.classList.remove('active');
+            modal.classList.remove('leaving');
+          }
+          window.scrollTo(0, 0);
+        }, 650);
       }
 
       const bgCanvas = document.getElementById('lanternCanvas');
@@ -647,6 +659,9 @@
       const sCtx = sceneCanvas ? sceneCanvas.getContext('2d') : null;
       const rapunzelState = {
         released: false,
+        entering: false,
+        releaseStartedAt: null,
+        releaseDurationMs: 4000,
         lanternX: 255,
         lanternY: 205,
         driftPhase: 0,
@@ -659,10 +674,19 @@
       };
 
       function releaseRapunzelLantern() {
+        if (rapunzelState.released || rapunzelState.entering) return;
         rapunzelState.released = true;
+        rapunzelState.releaseStartedAt = performance.now();
+        const releaseBtn = document.getElementById('releaseBtn');
+        if (releaseBtn) {
+          releaseBtn.disabled = true;
+          releaseBtn.textContent = 'A lanterna está subindo...';
+          releaseBtn.style.opacity = '0.65';
+        }
         const caption = document.getElementById('sceneCaption');
-        if (caption) caption.textContent = '"Vejo enfim a luz brilhar..."';
+        if (caption) caption.textContent = 'Uma luz especial ilumina esta noite...';
         startRapunzelMusic();
+        setTimeout(enterInvitation, rapunzelState.releaseDurationMs + 400);
       }
 
       function initRapunzelScene() {
@@ -732,13 +756,11 @@
           sCtx.stroke();
 
           if (rapunzelState.released) {
-            rapunzelState.driftPhase += 0.03;
-            rapunzelState.lanternY -= 0.95;
-            rapunzelState.lanternX += Math.sin(rapunzelState.driftPhase) * 0.55;
-            if (rapunzelState.lanternY < -30) {
-              rapunzelState.lanternY = 215;
-              rapunzelState.lanternX = 255;
-            }
+            const elapsed = performance.now() - rapunzelState.releaseStartedAt;
+            const progress = Math.min(1, elapsed / rapunzelState.releaseDurationMs);
+            const eased = progress * progress * (3 - 2 * progress);
+            rapunzelState.lanternY = 205 - eased * 270;
+            rapunzelState.lanternX = 255 + Math.sin(progress * Math.PI * 5) * 9;
           }
 
           sCtx.save();
@@ -840,7 +862,6 @@
         document.getElementById('sunSealBtn').addEventListener('click', openRapunzelScene);
         document.getElementById('coverHintBtn').addEventListener('click', openRapunzelScene);
         document.getElementById('releaseBtn').addEventListener('click', releaseRapunzelLantern);
-        document.getElementById('enterBtn').addEventListener('click', enterInvitation);
       }
 
       function boot() {
