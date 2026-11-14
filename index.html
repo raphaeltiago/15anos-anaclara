@@ -365,6 +365,30 @@
     }
     @media(max-width:600px){#coverScreen::before {background:linear-gradient(180deg,rgba(16,9,36,.38),rgba(24,10,40,.18) 50%,rgba(16,8,31,.58)),url('rio-lanternas.svg') center center / cover no-repeat;}}
 
+
+    /* Fundo único e contínuo em todas as etapas do convite */
+    body {background:#160f2c;}
+    body::before {
+      content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:linear-gradient(180deg,rgba(16,9,36,.38),rgba(24,10,40,.18) 50%,rgba(16,8,31,.62)),url('rio-lanternas.svg') center / cover no-repeat;
+    }
+    #coverScreen {background:transparent;}
+    #coverScreen::before {display:none;}
+    #rapunzelModal,#rapunzelModal.active {background:transparent;}
+    #rapunzelModal .scene-box {background:transparent;box-shadow:none;}
+    #rapunzelModal .scene-box::before {display:none;}
+    #rapunzelModal .scene-photo,#rapunzelModal .photo-vignette {display:none;}
+    #rapunzelModal .scene-caption {text-shadow:0 2px 12px #130820;}
+    .container {position:relative;z-index:2;}
+    /* A aba se dobra atrás da carta, sem piscar ou atravessá-la */
+    .envelope-flap {backface-visibility:hidden;transform-style:preserve-3d;}
+    #coverScreen.opening .envelope-flap {transform:rotateX(178deg);z-index:0;}
+    .envelope-letter {backface-visibility:hidden;will-change:transform;}
+    #coverScreen.opening .envelope-intro {opacity:1;transform:none;}
+    #coverScreen.opening.crossfade .envelope-intro {opacity:0;transform:scale(1.035);transition:opacity 1.7s ease,transform 1.7s ease;}
+    #coverScreen.opening .envelope-button {transform:rotate(0) scale(1);}
+    @media(prefers-reduced-motion:reduce){body::before{animation:none}}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -676,7 +700,7 @@
         <span class="envelope-back"></span><span class="envelope-letter">Um convite especial para você ✦</span>
         <span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">✦</span>
       </button>
-      <button class="envelope-hint" type="button" id="coverHintBtn">✉ Uma surpresa espera por você</button>
+      <button class="envelope-hint" type="button" id="coverHintBtn">Toque aqui para abrir seu convite</button>
     </div>
     <div class="opening-glow" aria-hidden="true"></div>
   </section>
