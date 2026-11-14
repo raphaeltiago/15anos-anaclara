@@ -780,6 +780,8 @@
         const tokenField = document.getElementById('rsvpToken');
         let pendingToken = null;
         let timeoutId = null;
+        let submissionStarted = false;
+        const receiver = document.getElementById('rsvpReceiver');
 
         function finish(message, success) {
           pendingToken = null;
@@ -790,6 +792,14 @@
           feedback.textContent = message;
           if (success) form.reset();
         }
+
+        // O iframe pode carregar mesmo quando o Apps Script não consegue
+        // transmitir a mensagem de volta por causa do isolamento do Google.
+        // Isso indica término da navegação, não confirma a gravação na planilha.
+        receiver.addEventListener('load', () => {
+          if (!submissionStarted || !pendingToken) return;
+          finish('Solicitação enviada ao Google. Confira o registro na planilha antes de reenviar.', false);
+        });
 
         window.addEventListener('message', (event) => {
           if (!pendingToken || !event.data || typeof event.data !== 'object') return;
@@ -806,6 +816,7 @@
           if (pendingToken) { event.preventDefault(); return; }
           const names = document.getElementById('guestName').value.trim();
           if (!names) { event.preventDefault(); feedback.textContent = 'Informe o nome dos convidados.'; return; }
+          submissionStarted = true;
           pendingToken = (window.crypto && crypto.randomUUID)
             ? crypto.randomUUID()
             : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
@@ -814,7 +825,7 @@
           button.textContent = 'Enviando...';
           feedback.textContent = 'Registrando confirmação, aguarde...';
           timeoutId = setTimeout(() => {
-            if (pendingToken) finish('Não foi possível verificar o registro. Confira a planilha antes de tentar novamente para evitar duplicidade.', false);
+            if (pendingToken) finish('Solicitação enviada, mas não foi possível confirmar a gravação automaticamente. Confira a planilha antes de reenviar.', false);
           }, 20000);
         });
       }
