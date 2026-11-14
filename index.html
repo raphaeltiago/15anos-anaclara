@@ -451,6 +451,46 @@
     #rapunzelModal .scene-caption {bottom:22vh;}
     @media(prefers-reduced-motion:reduce){.lantern-continue-light{animation:none}}
 
+
+    /* Envelope estável em 2D: evita falha da dobra 3D e sobreposição do título */
+    .envelope-intro {position:relative;z-index:2;}
+    .envelope-button {
+      perspective:none;transform-style:flat;overflow:visible;
+      margin-top:32px;margin-bottom:30px;isolation:isolate;
+    }
+    .envelope-back {z-index:0;}
+    .envelope-letter {
+      z-index:1;top:13%;height:76%;padding:17px 12px 0;
+      background:linear-gradient(180deg,#fff9e9,#f0e0cf);
+      transition:transform 1.65s cubic-bezier(.2,.75,.25,1) 1.15s;
+      box-shadow:0 3px 12px rgba(25,8,32,.12);
+    }
+    .envelope-front {
+      z-index:3;
+      background:linear-gradient(150deg,#efdfca,#c7aa9c);
+      clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%);
+    }
+    .envelope-flap {
+      z-index:4;transform:none;transform-origin:top center;
+      backface-visibility:visible;transform-style:flat;
+      transition:transform 1.05s cubic-bezier(.35,.05,.2,1),opacity .5s ease .75s;
+    }
+    #coverScreen.opening .envelope-flap {transform:scaleY(-1);opacity:0;z-index:4;}
+    #coverScreen.opening .envelope-letter {transform:translateY(-67px);}
+    .envelope-seal {z-index:5;}
+    #coverScreen.opening .envelope-intro {opacity:1;transform:none;}
+    #coverScreen.opening.crossfade .envelope-intro {opacity:0;transform:scale(1.03);}
+    .lantern-continue {display:none!important;}
+    #rapunzelModal .scene-caption {
+      bottom:8vh;left:16px;right:16px;max-width:600px;
+      margin:0 auto;text-align:center;
+      font-size:clamp(.7rem,1.6vw,.9rem);
+      line-height:1.5;
+      padding:0 10px;
+    }
+    #rapunzelModal .scene-box {height:100%;max-height:none;}
+    @media(max-width:600px){.envelope-button{margin-top:26px;}#coverScreen.opening .envelope-letter{transform:translateY(-60px);}}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -773,7 +813,7 @@
       <img class="scene-photo" src="Lanterna%20dos%20Desejos%20ao%20Entardecer.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
       <div class="floating-lantern" aria-hidden="true"></div>
-      <button id="lanternContinueBtn" class="lantern-continue" type="button" aria-label="Soltar a luz e revelar o convite"><span class="lantern-continue-light" aria-hidden="true">✦</span><span>Toque na luz para revelar seu convite</span></button>
+
     </div>
     <p class="scene-caption" id="sceneCaption">A luz dos desejos ilumina esta noite especial...</p>
     <div class="scene-actions" style="display:none">
@@ -952,9 +992,7 @@
         setTimeout(() => { if (modal) modal.classList.add('active'); }, 4400);
         setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
         setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
-        setTimeout(() => {
-          if (modal) modal.classList.add('ready');
-        }, 7100);
+        setTimeout(releaseRapunzelLantern, 7350);
       }
 
       function enterInvitation() {
@@ -1057,7 +1095,7 @@
           releaseBtn.style.opacity = '0.65';
         }
         const caption = document.getElementById('sceneCaption');
-        if (caption) caption.textContent = 'Uma luz especial ilumina esta noite...';
+        if (caption) caption.textContent = 'Que esta luz ilumine uma noite inesquecível...';
         startRapunzelMusic();
         setTimeout(enterInvitation, rapunzelState.releaseDurationMs + 350);
       }
@@ -1233,7 +1271,7 @@
       function bindEvents() {
         window.addEventListener('resize', resizeBg);
         document.getElementById('sunSealBtn').addEventListener('click', openRapunzelScene);
-        document.getElementById('lanternContinueBtn').addEventListener('click', releaseRapunzelLantern);
+
         document.getElementById('releaseBtn').addEventListener('click', releaseRapunzelLantern);
       }
 
