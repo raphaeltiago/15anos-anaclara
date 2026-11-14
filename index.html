@@ -365,7 +365,8 @@
     }
 
     input,
-    select {
+    select,
+    textarea {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
@@ -373,8 +374,11 @@
       background: rgba(26, 11, 46, 0.92);
       color: var(--white);
       font-size: 0.95rem;
+      font-family: inherit;
     }
 
+    textarea { resize: vertical; min-height: 105px; }
+    .rsvp-help { color: var(--lavender); font-size: 0.82rem; line-height: 1.5; margin-top: 7px; }
     .rsvp-feedback {
       margin-top: 12px;
       font-size: 0.9rem;
@@ -392,7 +396,7 @@
   </style>
 </head>
 <body>
-  <button type="button" class="music-toggle" id="musicToggleBtn">♪ Música: Off</button>
+
 
   <canvas id="lanternCanvas"></canvas>
 
@@ -445,13 +449,13 @@
         Celebre conosco uma noite iluminada pelas lanternas de Corona.
       </p>
       <div class="alert-box">
-        <strong>Atenção ao Dress Code:</strong> Pedimos com carinho que os convidados <u>não utilizem roupas nas cores roxo ou lilás</u>, tons reservados exclusivamente para a debutante.
+        <strong>Atenção ao Dress Code:</strong> Para esta noite especial, sugerimos <strong>traje esporte fino</strong>. Pedimos também, com carinho, que os convidados <u>não utilizem roupas nas cores roxo ou lilás</u>, tons reservados exclusivamente para a debutante.
       </div>
     </div>
 
     <div class="card">
       <h3 class="section-title">Local do Evento</h3>
-      <p id="venueName" style="font-weight: 600;">Espaço das Lanternas</p>
+      <p id="venueName" style="font-weight: 600;">Mansão Zurich</p>
       <p id="venueAddress" class="venue-address">R. do Acre, 255 - Mooca, São Paulo - SP, 03181-100</p>
       <div class="btn-group">
         <a id="googleMapsLink" href="https://www.google.com/maps/search/?api=1&query=R.+do+Acre%2C+255+-+Mooca%2C+S%C3%A3o+Paulo+-+SP%2C+03181-100" target="_blank" rel="noopener noreferrer" class="btn-map">Google Maps</a>
@@ -461,24 +465,16 @@
 
     <div class="card">
       <h3 class="section-title">Confirmação de Presença</h3>
-      <form id="rsvpForm">
+      <form id="rsvpForm" method="POST" target="rsvpReceiver" action="https://script.google.com/macros/s/AKfycbyup4qUMSeN6Xj4PbspEMMpGY98SRMUchHhuADzgEghY2mH15RuEO16VgJjJZfRyD5c/exec">
         <div>
-          <label for="guestName">Nome Completo</label>
-          <input id="guestName" type="text" required placeholder="Digite seu nome">
+          <label for="guestName">Nome completo de todos os convidados que irão comparecer</label>
+          <textarea id="guestName" name="nome" required maxlength="1500" placeholder="Ex.: Maria Silva, João Silva e Ana Silva"></textarea>
+          <p class="rsvp-help">Confirme por toda a família informando o nome completo de cada participante, separado por vírgulas ou linhas.</p>
         </div>
-        <div>
-          <label for="guestStatus">Você irá ao evento?</label>
-          <select id="guestStatus" required>
-            <option value="sim">Sim, estarei presente!</option>
-            <option value="nao">Infelizmente não poderei ir</option>
-          </select>
-        </div>
-        <div>
-          <label for="guestCount">Quantidade de Acompanhantes</label>
-          <input id="guestCount" type="number" min="0" max="5" value="0">
-        </div>
-        <button type="submit" class="btn-primary">Confirmar Presença</button>
+        <input type="hidden" name="token" id="rsvpToken">
+        <button type="submit" class="btn-primary" id="rsvpSubmitBtn">Confirmar Presença</button>
       </form>
+      <iframe name="rsvpReceiver" id="rsvpReceiver" title="Envio da confirmação" hidden></iframe>
       <p class="rsvp-feedback" id="rsvpFeedback"></p>
     </div>
 
@@ -488,7 +484,7 @@
   <script>
     (function () {
       const EVENT_CONFIG = {
-        venueName: 'Espaço das Lanternas',
+        venueName: 'Mansão Zurich',
         address: 'R. do Acre, 255 - Mooca, São Paulo - SP, 03181-100',
         dateIso: '2027-01-10T19:00:00-03:00'
       };
@@ -779,15 +775,47 @@
 
       function initRSVP() {
         const form = document.getElementById('rsvpForm');
-        if (!form) return;
-        form.addEventListener('submit', function (event) {
-          event.preventDefault();
-          const name = document.getElementById('guestName').value.trim();
-          const status = document.getElementById('guestStatus').value;
-          const feedback = document.getElementById('rsvpFeedback');
-          feedback.textContent = status === 'sim'
-            ? `Presença confirmada para ${name}! Nos vemos dia 10/01/2027 às 19h no Reino de Corona.`
-            : `Resposta registrada para ${name}. Obrigado por avisar!`;
+        const feedback = document.getElementById('rsvpFeedback');
+        const button = document.getElementById('rsvpSubmitBtn');
+        const tokenField = document.getElementById('rsvpToken');
+        let pendingToken = null;
+        let timeoutId = null;
+
+        function finish(message, success) {
+          pendingToken = null;
+          if (timeoutId) clearTimeout(timeoutId);
+          timeoutId = null;
+          button.disabled = false;
+          button.textContent = 'Confirmar Presença';
+          feedback.textContent = message;
+          if (success) form.reset();
+        }
+
+        window.addEventListener('message', (event) => {
+          if (!pendingToken || !event.data || typeof event.data !== 'object') return;
+          const trusted = /^https:\/\/(?:[a-z0-9-]+\.)*(?:googleusercontent\.com|script\.google\.com)$/.test(event.origin);
+          if (!trusted || event.data.tipo !== 'rsvp-resultado' || event.data.token !== pendingToken) return;
+          if (event.data.sucesso === true) {
+            finish('Presença confirmada! Os nomes foram registrados. Esperamos vocês no dia 10/01/2027!', true);
+          } else {
+            finish('Não foi possível confirmar agora. Tente novamente em alguns instantes.', false);
+          }
+        });
+
+        form.addEventListener('submit', (event) => {
+          if (pendingToken) { event.preventDefault(); return; }
+          const names = document.getElementById('guestName').value.trim();
+          if (!names) { event.preventDefault(); feedback.textContent = 'Informe o nome dos convidados.'; return; }
+          pendingToken = (window.crypto && crypto.randomUUID)
+            ? crypto.randomUUID()
+            : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+          tokenField.value = pendingToken;
+          button.disabled = true;
+          button.textContent = 'Enviando...';
+          feedback.textContent = 'Registrando confirmação, aguarde...';
+          timeoutId = setTimeout(() => {
+            if (pendingToken) finish('Não foi possível verificar o registro. Confira a planilha antes de tentar novamente para evitar duplicidade.', false);
+          }, 20000);
         });
       }
 
@@ -797,7 +825,6 @@
         document.getElementById('coverHintBtn').addEventListener('click', openRapunzelScene);
         document.getElementById('releaseBtn').addEventListener('click', releaseRapunzelLantern);
         document.getElementById('enterBtn').addEventListener('click', enterInvitation);
-        document.getElementById('musicToggleBtn').addEventListener('click', toggleRapunzelMusic);
       }
 
       function boot() {
@@ -809,4 +836,12 @@
         bindEvents();
       }
 
-      if (document.
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+  </script>
+</body>
+</html>
