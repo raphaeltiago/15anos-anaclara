@@ -180,6 +180,33 @@
       cursor: pointer;
     }
 
+
+    /* Abertura original: torre, envelope e passagem luminosa */
+    #coverScreen { perspective: 1100px; }
+    .tower-silhouette { position:absolute; left:50%; bottom:-2vh; transform:translateX(-50%); width:min(78vw,390px); height:77vh; pointer-events:none; opacity:.62; z-index:-1; filter:drop-shadow(0 0 35px rgba(234,186,107,.15)); }
+    .tower-body {position:absolute; bottom:0; left:25%; width:50%; height:75%; background:linear-gradient(90deg,#21112f,#483252 48%,#21112f); border:2px solid rgba(218,174,107,.18); border-radius:12px 12px 0 0;}
+    .tower-roof {position:absolute; bottom:73%; left:12%; width:76%; height:26%; background:linear-gradient(130deg,#513453,#1b102b); clip-path:polygon(50% 0,100% 100%,0 100%); }
+    .tower-window {position:absolute; left:42%; top:45%; width:16%; height:14%; border-radius:50% 50% 5px 5px; background:radial-gradient(#fff2b2,#d18c48 65%,#593650); box-shadow:0 0 45px 15px rgba(255,189,95,.28); border:3px solid #9d774d;}
+    .envelope-intro {position:relative; display:flex; flex-direction:column; align-items:center; z-index:2; transition:opacity .8s ease,transform .8s ease; }
+    .envelope-button {position:relative; display:block; width:min(76vw,290px); height:186px; border:0; padding:0; margin:18px auto 28px; background:transparent; cursor:pointer; perspective:900px; filter:drop-shadow(0 15px 28px rgba(0,0,0,.4));}
+    .envelope-back {position:absolute; inset:0; border-radius:7px; background:linear-gradient(140deg,#e9d4ab,#b997c2); border:2px solid #d8b76c;}
+    .envelope-letter {position:absolute; left:12%; top:17%; width:76%; height:78%; padding:24px 8px 0; border-radius:5px; background:linear-gradient(#fff1d2,#e9d8f4); color:#79558c; font-family:'Cinzel',serif; font-size:15px; letter-spacing:2px; transition:transform 1.5s ease .4s; }
+    .envelope-front {position:absolute; inset:0; background:linear-gradient(145deg,#ead8b9,#b899cc); clip-path:polygon(0 0,50% 53%,100% 0,100% 100%,0 100%); border-radius:6px; }
+    .envelope-flap {position:absolute; left:0; top:0; width:100%; height:56%; background:linear-gradient(#f9e7bd,#d4af83); clip-path:polygon(0 0,100% 0,50% 100%); transform-origin:top; transition:transform 1.15s ease; z-index:3; }
+    .envelope-seal {position:absolute; z-index:4; top:38%; left:calc(50% - 23px); width:46px; height:46px; display:grid; place-items:center; border-radius:50%; background:radial-gradient(#ffebb0,#b98a35); color:#6c422c; font-size:24px; box-shadow:0 0 18px #ffe1a5; transition:opacity .35s; }
+    #coverScreen.opening .envelope-flap {transform:rotateX(175deg); z-index:0;}
+    #coverScreen.opening .envelope-seal {opacity:0;}
+    #coverScreen.opening .envelope-letter {transform:translateY(-96px);}
+    #coverScreen.opening .envelope-intro {opacity:0;transform:scale(1.2);transition-delay:1.9s;}
+    .opening-glow {position:absolute; inset:0; z-index:6; background:radial-gradient(circle,#fff4c9,#f6d7a4 35%,rgba(250,214,162,0) 80%); opacity:0; pointer-events:none;}
+    #coverScreen.opening .opening-glow {animation:envelopeFlash 2.6s 1.15s forwards;}
+    @keyframes envelopeFlash {0%{opacity:0;transform:scale(.15)}45%{opacity:.95;transform:scale(1.3)}100%{opacity:0;transform:scale(2)}}
+    .envelope-label {font-family:'Cinzel',serif;color:#f9e4ac;letter-spacing:1px;font-size:.95rem;text-shadow:0 2px 14px #180a2c;}
+    .envelope-title {font-family:'Great Vibes',cursive;font-size:clamp(3.1rem,10vw,4.5rem);color:#ffe5a0;text-shadow:0 0 18px #4b2359;}
+    .envelope-subtitle {font-family:'Cinzel',serif;letter-spacing:3px;font-size:.9rem;color:#f3dfff;}
+    .envelope-hint {margin-top:7px;padding:12px 20px;border:1px solid #d9b46a;border-radius:40px;background:rgba(35,14,55,.78);color:#fff0c2;font-size:.9rem;cursor:pointer;}
+    @media (prefers-reduced-motion:reduce) { .cover-lantern {animation:none;} }
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -474,39 +501,26 @@
 
   <canvas id="lanternCanvas"></canvas>
 
-  <!-- Capa Inicial -->
-  <section id="coverScreen" aria-label="Capa do Convite">
+  <!-- Abertura com torre e envelope interativo -->
+  <section id="coverScreen" aria-label="Abertura do convite de Ana Clara">
     <div class="cover-decor" aria-hidden="true">
-      <span class="cover-floral top">❀</span><span class="cover-floral bottom">❀</span>
       <span class="cover-lantern" style="left:9%;top:95%;--dur:13s;--delay:-4s"></span>
       <span class="cover-lantern" style="left:22%;top:80%;--dur:17s;--delay:-9s"></span>
       <span class="cover-lantern" style="left:76%;top:88%;--dur:14s;--delay:-6s"></span>
       <span class="cover-lantern" style="left:91%;top:65%;--dur:19s;--delay:-12s"></span>
-      <span class="cover-lantern" style="left:55%;top:100%;--dur:21s;--delay:-14s"></span>
     </div>
-    <button type="button" class="sun-seal" id="sunSealBtn" aria-label="Abrir convite">
-      <svg viewBox="0 0 100 100" aria-hidden="true">
-        <g transform="translate(50 50)">
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(45)"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(90)"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(135)"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(180)"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(225)"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(270)"/>
-          <path d="M0 -43 Q10 -29 0 -23 Q-10 -29 0 -43Z" fill="#e7bd64" stroke="#9d7033" transform="rotate(315)"/>
-          <circle r="24" fill="#f6d782" stroke="#956a30" stroke-width="2"/>
-          <circle r="18" stroke="#a87939"/>
-          <path d="M-12 5 Q0 -16 12 5 Q0 16 -12 5Z" stroke-width="2"/>
-          <circle r="3" fill="#a87939" stroke="none"/>
-        </g>
-      </svg>
-    </button>
-    <h1 class="cover-title">Ana Clara</h1>
-    <p class="cover-subtitle">Meus 15 Anos</p>
-    <div class="cover-ornament" aria-hidden="true">✦ ❀ ✦</div>
-    <p class="cover-tagline">Uma noite para iluminar sonhos...</p>
-    <button type="button" class="cover-hint" id="coverHintBtn">✨ Toque no Sol e deixe a magia começar...</button>
+    <div class="tower-silhouette" aria-hidden="true"><div class="tower-roof"></div><div class="tower-body"></div><div class="tower-window"></div></div>
+    <div class="envelope-intro">
+      <p class="envelope-label">Uma noite encantada espera por você</p>
+      <h1 class="envelope-title">Ana Clara</h1>
+      <p class="envelope-subtitle">MEUS 15 ANOS</p>
+      <button class="envelope-button" type="button" id="sunSealBtn" aria-label="Abrir o envelope do convite">
+        <span class="envelope-back"></span><span class="envelope-letter">Você está convidado ✦</span>
+        <span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">✦</span>
+      </button>
+      <button class="envelope-hint" type="button" id="coverHintBtn">✉ Toque no envelope para abrir</button>
+    </div>
+    <div class="opening-glow" aria-hidden="true"></div>
   </section>
 
   <!-- Cena fotográfica da Ana Clara com a lanterna -->
@@ -516,8 +530,8 @@
       <div class="photo-vignette" aria-hidden="true"></div>
       <div class="floating-lantern" aria-hidden="true"></div>
     </div>
-    <p class="scene-caption" id="sceneCaption">Toque em “Soltar Lanterna” e deixe seu desejo iluminar o céu.</p>
-    <div class="scene-actions">
+    <p class="scene-caption" id="sceneCaption">A luz dos desejos ilumina esta noite especial...</p>
+    <div class="scene-actions" style="display:none">
       <button type="button" class="btn-primary" id="releaseBtn">Soltar Lanterna</button>
     </div>
   </section>
@@ -676,12 +690,20 @@
         else startRapunzelMusic();
       }
 
+      let envelopeOpening = false;
       function openRapunzelScene() {
+        if (envelopeOpening) return;
+        envelopeOpening = true;
         const cover = document.getElementById('coverScreen');
         const modal = document.getElementById('rapunzelModal');
-        if (cover) cover.classList.add('hidden');
-        if (modal) modal.classList.add('active');
         startRapunzelMusic();
+        if (cover) cover.classList.add('opening');
+        setTimeout(() => {
+          if (cover) cover.classList.add('hidden');
+          if (modal) modal.classList.add('active');
+          // A fotografia da Ana Clara aparece e a lanterna sobe sem novo clique.
+          setTimeout(releaseRapunzelLantern, 1400);
+        }, 2900);
       }
 
       function enterInvitation() {
