@@ -268,6 +268,45 @@
       .scene-photo,.envelope-button {transition:none;}
     }
 
+
+    /* Transições contínuas entre abertura, lago e convite */
+    #coverScreen {z-index:122;transition:opacity 1.8s cubic-bezier(.22,.61,.36,1),filter 1.8s ease;}
+    #coverScreen.opening {opacity:1;filter:none;transition:none;}
+    #coverScreen.opening.crossfade {opacity:0;filter:brightness(1.3) blur(9px);transition:opacity 2.1s ease,filter 2.1s ease;}
+    #rapunzelModal {z-index:121;background:#1a102b;transition:opacity 2s ease,visibility 0s linear 2s;}
+    #rapunzelModal.active {transition:opacity 2s ease,visibility 0s;}
+    #rapunzelModal.leaving {opacity:0;visibility:hidden;transition:opacity 2.1s ease,visibility 0s linear 2.1s;}
+    #rapunzelModal .scene-box {
+      position:absolute;inset:0;width:100%;height:100%;max-width:none;
+      border:0;border-radius:0;box-shadow:none;
+      background:linear-gradient(#2d1838,#120a26);
+    }
+    #rapunzelModal .scene-box::before {background:rgba(21,8,40,.1);backdrop-filter:blur(30px);}
+    #rapunzelModal .scene-photo {object-fit:contain;object-position:center;transform:scale(1);filter:brightness(.86);}
+    #rapunzelModal.active .scene-photo {animation:lakeCamera 7.8s cubic-bezier(.2,.6,.2,1) both;}
+    @keyframes lakeCamera {0%{transform:scale(1.12);filter:brightness(.8)}100%{transform:scale(1.03);filter:brightness(1.02)}}
+    #rapunzelModal .scene-caption {position:absolute;bottom:8vh;left:20px;right:20px;text-shadow:0 2px 12px #130820;z-index:2;}
+    #rapunzelModal .floating-lantern {left:57%;top:63%;}
+    .cinematic-wash {
+      position:fixed;inset:0;z-index:125;pointer-events:none;opacity:0;
+      background:radial-gradient(ellipse at 53% 48%,rgba(255,252,222,1) 0%,rgba(255,225,159,.98) 22%,rgba(242,191,130,.68) 48%,transparent 78%);
+      transform:scale(.12);will-change:transform,opacity;
+    }
+    .cinematic-wash.bloom {animation:lightBloom 3.7s cubic-bezier(.18,.6,.25,1) forwards;}
+    .cinematic-wash.reveal {animation:lightReveal 2.8s ease-in-out forwards;}
+    @keyframes lightBloom {
+      0%{opacity:0;transform:scale(.1)}38%{opacity:.9;transform:scale(1.5)}
+      65%{opacity:.85;transform:scale(2.4)}100%{opacity:0;transform:scale(3)}
+    }
+    @keyframes lightReveal {
+      0%{opacity:0;transform:scale(.3)}40%{opacity:.85;transform:scale(1.7)}
+      65%{opacity:.7;transform:scale(2.2)}100%{opacity:0;transform:scale(3)}
+    }
+    .container {transition:filter 1.8s ease,opacity 1.8s ease;}
+    body.invite-emerging .container {animation:inviteFocus 2.1s ease-out both;}
+    @keyframes inviteFocus {from{filter:blur(10px) brightness(1.7);opacity:.4;transform:translateY(16px)}to{filter:none;opacity:1;transform:none}}
+    @media(prefers-reduced-motion:reduce){.cinematic-wash{display:none}body.invite-emerging .container{animation:none}}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -597,6 +636,8 @@
     </div>
   </section>
 
+  <div class="cinematic-wash" id="cinematicWash" aria-hidden="true"></div>
+
   <!-- Convite Principal -->
   <div class="container">
     <header>
@@ -759,10 +800,13 @@
         const modal = document.getElementById('rapunzelModal');
         startRapunzelMusic();
         if (cover) cover.classList.add('opening');
-        // Sobreposição das cenas: a imagem seguinte surge enquanto a capa desaparece.
-        setTimeout(() => { if (modal) modal.classList.add('active'); }, 1550);
-        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 3400);
-        setTimeout(releaseRapunzelLantern, 3650);
+        const wash = document.getElementById('cinematicWash');
+        // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
+        setTimeout(() => { if (wash) wash.classList.add('bloom'); }, 550);
+        setTimeout(() => { if (modal) modal.classList.add('active'); }, 1050);
+        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 1450);
+        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 3600);
+        setTimeout(releaseRapunzelLantern, 3900);
       }
 
       function enterInvitation() {
@@ -771,14 +815,18 @@
         const cover = document.getElementById('coverScreen');
         const modal = document.getElementById('rapunzelModal');
         if (cover) cover.classList.add('hidden');
-        if (modal) modal.classList.add('leaving');
+        const wash = document.getElementById('cinematicWash');
+        if (wash) { wash.classList.remove('bloom'); void wash.offsetWidth; wash.classList.add('reveal'); }
         setTimeout(() => {
-          if (modal) {
-            modal.classList.remove('active');
-            modal.classList.remove('leaving');
-          }
+          document.body.classList.add('invite-emerging');
+          if (modal) modal.classList.add('leaving');
           window.scrollTo(0, 0);
-        }, 1650);
+        }, 650);
+        setTimeout(() => {
+          if (modal) { modal.classList.remove('active'); modal.classList.remove('leaving'); }
+          document.body.classList.remove('invite-emerging');
+          if (wash) wash.classList.remove('reveal');
+        }, 2950);
       }
 
       const bgCanvas = document.getElementById('lanternCanvas');
