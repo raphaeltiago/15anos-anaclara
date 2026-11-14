@@ -412,6 +412,45 @@
     #coverScreen.opening .envelope-intro {opacity:1;transform:none;}
     #coverScreen.opening.crossfade .envelope-intro {opacity:0;transform:scale(1.035);}
 
+
+    /* Envelope refinado: abrir, erguer carta, segurar leitura e dissolver */
+    .envelope-button {overflow:visible;transform-style:preserve-3d;will-change:transform;}
+    .envelope-back {z-index:0;}
+    .envelope-letter {
+      z-index:1;top:12%;height:79%;padding:20px 15px 0;
+      font-size:13px;line-height:1.5;letter-spacing:.5px;
+      transition:transform 1.8s cubic-bezier(.16,1,.3,1) 1.05s;
+      box-shadow:0 4px 18px rgba(76,39,62,.18);
+    }
+    .envelope-front {z-index:2;}
+    .envelope-flap {z-index:4;transform-origin:top center;transition:transform 1.2s cubic-bezier(.3,.05,.2,1);backface-visibility:hidden;}
+    .envelope-seal {z-index:5;}
+    #coverScreen.opening .envelope-flap {transform:rotateX(179deg);z-index:4;}
+    #coverScreen.opening .envelope-letter {transform:translateY(-122px);}
+    #coverScreen.opening .envelope-intro {opacity:1;transform:none;}
+    #coverScreen.opening.crossfade .envelope-intro {opacity:0;transform:scale(1.08);transition:opacity 1.65s ease,transform 1.65s ease;}
+    .lantern-continue {
+      position:absolute;left:50%;bottom:8%;transform:translateX(-50%);
+      z-index:12;display:flex;flex-direction:column;align-items:center;gap:10px;
+      width:min(86%,310px);padding:10px 16px 14px;border:0;
+      background:transparent;color:#fff0c5;cursor:pointer;
+      font-family:'Cinzel',serif;font-size:.77rem;letter-spacing:.6px;
+      text-shadow:0 2px 12px #120820;
+      opacity:0;pointer-events:none;transition:opacity 1.2s ease;
+    }
+    #rapunzelModal.ready .lantern-continue {opacity:1;pointer-events:auto;}
+    .lantern-continue-light {
+      display:grid;place-items:center;width:65px;height:65px;border-radius:50%;
+      background:radial-gradient(circle,#fff9c9 0%,#f9d77c 28%,rgba(241,170,78,.5) 50%,transparent 75%);
+      color:#fff8db;font-size:30px;
+      filter:drop-shadow(0 0 15px #f9c86b);
+      animation:lanternBreath 2.8s ease-in-out infinite;
+    }
+    @keyframes lanternBreath {50%{transform:translateY(-8px) scale(1.1);filter:drop-shadow(0 0 28px #f9d78a)}}
+    #rapunzelModal.releasing .lantern-continue {opacity:0;pointer-events:none;}
+    #rapunzelModal .scene-caption {bottom:22vh;}
+    @media(prefers-reduced-motion:reduce){.lantern-continue-light{animation:none}}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -723,7 +762,7 @@
         <span class="envelope-back"></span><span class="envelope-letter">Um convite especial para você ✦</span>
         <span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">✦</span>
       </button>
-      <button class="envelope-hint" type="button" id="coverHintBtn">Toque aqui para abrir seu convite</button>
+
     </div>
     <div class="opening-glow" aria-hidden="true"></div>
   </section>
@@ -734,6 +773,7 @@
       <img class="scene-photo" src="Lanterna%20dos%20Desejos%20ao%20Entardecer.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
       <div class="floating-lantern" aria-hidden="true"></div>
+      <button id="lanternContinueBtn" class="lantern-continue" type="button" aria-label="Soltar a luz e revelar o convite"><span class="lantern-continue-light" aria-hidden="true">✦</span><span>Toque na luz para revelar seu convite</span></button>
     </div>
     <p class="scene-caption" id="sceneCaption">A luz dos desejos ilumina esta noite especial...</p>
     <div class="scene-actions" style="display:none">
@@ -912,7 +952,9 @@
         setTimeout(() => { if (modal) modal.classList.add('active'); }, 4400);
         setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
         setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
-        setTimeout(releaseRapunzelLantern, 7050);
+        setTimeout(() => {
+          if (modal) modal.classList.add('ready');
+        }, 7100);
       }
 
       function enterInvitation() {
@@ -1005,6 +1047,7 @@
       function releaseRapunzelLantern() {
         if (rapunzelState.released || rapunzelState.entering) return;
         rapunzelState.released = true;
+        document.getElementById('rapunzelModal')?.classList.add('releasing');
         rapunzelState.releaseStartedAt = performance.now();
         document.querySelector('.scene-box')?.classList.add('released');
         const releaseBtn = document.getElementById('releaseBtn');
@@ -1190,7 +1233,7 @@
       function bindEvents() {
         window.addEventListener('resize', resizeBg);
         document.getElementById('sunSealBtn').addEventListener('click', openRapunzelScene);
-        document.getElementById('coverHintBtn').addEventListener('click', openRapunzelScene);
+        document.getElementById('lanternContinueBtn').addEventListener('click', releaseRapunzelLantern);
         document.getElementById('releaseBtn').addEventListener('click', releaseRapunzelLantern);
       }
 
