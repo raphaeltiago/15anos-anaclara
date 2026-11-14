@@ -389,6 +389,29 @@
     #coverScreen.opening .envelope-button {transform:rotate(0) scale(1);}
     @media(prefers-reduced-motion:reduce){body::before{animation:none}}
 
+
+    /* Correção de regressão: capa cobre o conteúdo e retrato volta na cena da lanterna */
+    #coverScreen {background:#1b1031;isolation:isolate;}
+    #coverScreen::before {
+      display:block;content:"";position:absolute;inset:0;z-index:-2;
+      background:linear-gradient(180deg,rgba(16,9,36,.38),rgba(24,10,40,.18) 50%,rgba(16,8,31,.62)),url('rio-lanternas.svg') center / cover no-repeat;
+      filter:none;transform:none;animation:none;
+    }
+    #rapunzelModal {background:#1b1031;}
+    #rapunzelModal .scene-box {background:linear-gradient(180deg,rgba(20,9,39,.2),rgba(20,9,39,.35)),url('rio-lanternas.svg') center / cover no-repeat;}
+    #rapunzelModal .scene-box::before {
+      display:block;content:"";position:absolute;inset:0;
+      background:rgba(21,8,40,.45);backdrop-filter:blur(20px);
+    }
+    #rapunzelModal .scene-photo {
+      display:block;position:absolute;inset:0;width:100%;height:100%;
+      object-fit:contain;object-position:center;
+    }
+    #rapunzelModal .photo-vignette {display:block;}
+    #rapunzelModal .scene-box.released .scene-photo {filter:brightness(.9);}
+    #coverScreen.opening .envelope-intro {opacity:1;transform:none;}
+    #coverScreen.opening.crossfade .envelope-intro {opacity:0;transform:scale(1.035);}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
