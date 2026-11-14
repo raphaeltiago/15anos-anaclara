@@ -873,6 +873,33 @@
     #coverScreen.opening .envelope-intro {opacity:1!important;transform:none!important;}
     #coverScreen.opening.crossfade .envelope-intro {opacity:0!important;transition:opacity 1.8s ease!important;}
 
+
+    /* Enquadramento confortável: panorama completo e continuidade nas laterais */
+    #rapunzelModal .scene-box {
+      background:linear-gradient(rgba(15,9,30,.12),rgba(15,9,30,.12)),
+      url('./Luz%20de%20Ver%C3%A3o%20no%20Lago.png?v=3') center center / cover no-repeat;
+    }
+    #rapunzelModal .scene-photo,
+    #rapunzelModal.active .scene-photo,
+    #rapunzelModal .scene-box.released .scene-photo {
+      width:100%;height:100%;object-fit:contain;object-position:center;
+      transform:none!important;animation:none!important;filter:none!important;
+      -webkit-mask-image:linear-gradient(to right,transparent 0%,black 9%,black 91%,transparent 100%);
+      mask-image:linear-gradient(to right,transparent 0%,black 9%,black 91%,transparent 100%);
+    }
+    @media(max-width:650px) {
+      #rapunzelModal .scene-photo,#rapunzelModal.active .scene-photo {
+        object-fit:contain;-webkit-mask-image:none;mask-image:none;
+      }
+    }
+    /* Mantém envelope e carta em ordem fixa mesmo ao voltar ao link */
+    #coverScreen .envelope-back {z-index:0;}
+    #coverScreen .envelope-letter {z-index:1;}
+    #coverScreen .envelope-front {z-index:3;}
+    #coverScreen .envelope-flap {z-index:4;}
+    #coverScreen .envelope-seal {z-index:5;}
+    #coverScreen.opening .envelope-seal {opacity:0;transition:opacity .35s ease;}
+
 </style>
 </head>
 <body>
@@ -1073,6 +1100,20 @@
       }
 
       let envelopeOpening = false;
+      // Evita restaurar uma animação pela metade ao retornar pelo histórico do navegador.
+      window.addEventListener('pageshow', (event) => {
+        if (!event.persisted) return;
+        envelopeOpening = false;
+        rapunzelState.released = false;
+        rapunzelState.entering = false;
+        const cover = document.getElementById('coverScreen');
+        const modal = document.getElementById('rapunzelModal');
+        const wash = document.getElementById('cinematicWash');
+        cover?.classList.remove('opening','crossfade','hidden');
+        modal?.classList.remove('active','leaving','ready','releasing');
+        wash?.classList.remove('bloom','reveal');
+        document.body.classList.remove('invite-emerging');
+      });
       function openRapunzelScene() {
         if (envelopeOpening) return;
         envelopeOpening = true;
