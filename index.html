@@ -207,6 +207,67 @@
     .envelope-hint {margin-top:7px;padding:12px 20px;border:1px solid #d9b46a;border-radius:40px;background:rgba(35,14,55,.78);color:#fff0c2;font-size:.9rem;cursor:pointer;}
     @media (prefers-reduced-motion:reduce) { .cover-lantern {animation:none;} }
 
+
+    /* Versão cinematográfica: imagem real, movimento de câmera e dissolvências */
+    #coverScreen {
+      background: #160b26;
+      transition: opacity 1.65s cubic-bezier(.2,.65,.2,1), filter 1.65s ease;
+    }
+    #coverScreen::before {
+      z-index:-2;
+      background:
+        linear-gradient(180deg,rgba(18,7,35,.64),rgba(25,9,42,.38) 40%,rgba(18,7,35,.86)),
+        url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center center / cover no-repeat;
+      transform:scale(1.12);
+      animation: cinematicCamera 17s ease-out both;
+    }
+    @keyframes cinematicCamera {
+      from {transform:scale(1.2) translateY(2%);filter:blur(3px);}
+      to {transform:scale(1.06) translateY(-1%);filter:blur(0);}
+    }
+    .tower-silhouette {display:none;}
+    .envelope-intro {filter:drop-shadow(0 12px 38px rgba(0,0,0,.48));}
+    .envelope-button {width:min(72vw,260px);height:166px;transform:rotate(-3deg);transition:transform 1.4s cubic-bezier(.2,.8,.2,1);}
+    .envelope-button:hover {transform:rotate(0) translateY(-5px);}
+    .envelope-back {background:linear-gradient(145deg,#f8e9d5,#d4bca6);}
+    .envelope-front {background:linear-gradient(145deg,#f4e4cf,#c7aa99);}
+    .envelope-flap {background:linear-gradient(165deg,#f8e7cf,#d9bba6);}
+    .envelope-letter {background:linear-gradient(#fff9e8,#f4e6d7);color:#6d4567;}
+    .envelope-label {font-size:.8rem;letter-spacing:1.3px;}
+    #coverScreen.opening {opacity:0;filter:brightness(1.45);pointer-events:none;transition-delay:1.7s;}
+    #coverScreen.opening .envelope-button {transform:rotate(0) scale(1.09);}
+    #coverScreen.opening .envelope-intro {transition-delay:1.35s;}
+    #coverScreen.opening .opening-glow {animation:envelopeFlash 2.8s .65s forwards;}
+    #rapunzelModal {
+      display:flex;opacity:0;visibility:hidden;pointer-events:none;
+      background:radial-gradient(ellipse at center,#51345d,#120b24);
+      transition:opacity 1.8s cubic-bezier(.2,.65,.2,1),visibility 0s linear 1.8s;
+    }
+    #rapunzelModal.active {opacity:1;visibility:visible;pointer-events:auto;transition:opacity 1.8s ease,visibility 0s;}
+    #rapunzelModal.leaving {opacity:0;visibility:hidden;transition:opacity 1.6s ease,visibility 0s linear 1.6s;}
+    .scene-box {
+      width:min(94vw,440px);max-width:440px;
+      height:min(78vh,670px);border:0;border-radius:3px;
+      box-shadow:0 0 85px rgba(222,174,122,.15);
+      background-color:#1b102a;
+    }
+    .scene-box::before {background:rgba(21,8,40,.35);backdrop-filter:blur(24px);}
+    .scene-photo {transition:transform 7s ease-out,filter 5s ease;transform:scale(1.025);}
+    .scene-box.released .scene-photo {transform:scale(1.09);filter:brightness(1.03);}
+    .scene-caption {font-size:.88rem;letter-spacing:.6px;}
+    .floating-lantern {left:57%;top:64%;width:10px;height:10px;}
+    @keyframes lanternLightRise {
+      0% {transform:translate(0,0) scale(.2);opacity:0;}
+      18% {opacity:.65;}
+      55% {opacity:.85;}
+      100% {transform:translate(24px,-390px) scale(2.8);opacity:0;}
+    }
+    @media (max-width:600px) {.scene-box {height:min(74vh,610px);}.envelope-title {font-size:3.6rem;}}
+    @media (prefers-reduced-motion:reduce) {
+      #coverScreen::before {animation:none;transform:none;}
+      .scene-photo,.envelope-button {transition:none;}
+    }
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -698,12 +759,10 @@
         const modal = document.getElementById('rapunzelModal');
         startRapunzelMusic();
         if (cover) cover.classList.add('opening');
-        setTimeout(() => {
-          if (cover) cover.classList.add('hidden');
-          if (modal) modal.classList.add('active');
-          // A fotografia da Ana Clara aparece e a lanterna sobe sem novo clique.
-          setTimeout(releaseRapunzelLantern, 1400);
-        }, 2900);
+        // Sobreposição das cenas: a imagem seguinte surge enquanto a capa desaparece.
+        setTimeout(() => { if (modal) modal.classList.add('active'); }, 1550);
+        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 3400);
+        setTimeout(releaseRapunzelLantern, 3650);
       }
 
       function enterInvitation() {
@@ -719,7 +778,7 @@
             modal.classList.remove('leaving');
           }
           window.scrollTo(0, 0);
-        }, 650);
+        }, 1650);
       }
 
       const bgCanvas = document.getElementById('lanternCanvas');
@@ -803,7 +862,7 @@
         const caption = document.getElementById('sceneCaption');
         if (caption) caption.textContent = 'Uma luz especial ilumina esta noite...';
         startRapunzelMusic();
-        setTimeout(enterInvitation, rapunzelState.releaseDurationMs + 400);
+        setTimeout(enterInvitation, rapunzelState.releaseDurationMs + 350);
       }
 
       function initRapunzelScene() {
