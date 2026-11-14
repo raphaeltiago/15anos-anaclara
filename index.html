@@ -183,37 +183,40 @@
     }
 
     #sceneCanvas { display: none; }
-    .scene-box { height: min(66vh, 540px); max-width: 410px; }
+    .scene-box {
+      height: min(70vh, 590px); max-width: 410px;
+      background: #190b2d url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center / cover no-repeat;
+    }
+    .scene-box::before {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(21,8,40,.65); backdrop-filter: blur(16px);
+    }
     .scene-photo {
       position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; object-position: center 43%;
-      transition: transform 4.8s ease, filter 4.8s ease;
+      object-fit: contain; object-position: center center;
+      transition: filter 4.8s ease;
     }
-    .scene-box.released .scene-photo { transform: scale(1.12); filter: brightness(0.72); }
+    .scene-box.released .scene-photo { filter: brightness(0.88); }
     .photo-vignette {
       position: absolute; inset: 0; pointer-events: none;
       background: linear-gradient(to top, rgba(19,5,38,.48), transparent 35%),
                   radial-gradient(ellipse at center, transparent 42%, rgba(18,6,36,.25));
     }
+    /* A foto já contém a lanterna: animamos apenas a luz que sai dela. */
     .floating-lantern {
-      position: absolute; left: 52%; top: 49%; width: 25%; aspect-ratio: .85;
-      border-radius: 14% 14% 22% 22%;
-      background: radial-gradient(ellipse at 50% 65%, #fff6bf 0%, #ffd86d 38%, #e7a748 85%);
-      box-shadow: 0 0 25px 8px rgba(255,193,81,.45), inset 0 -8px 12px rgba(144,69,22,.2);
-      opacity: 0; pointer-events: none;
-    }
-    .floating-lantern::after {
-      content: '✦'; position: absolute; top: 24%; left: 0; width: 100%;
-      text-align: center; font-size: 2rem; color: rgba(150,80,30,.55);
+      position: absolute; left: 58%; top: 66%; width: 14px; height: 14px;
+      border-radius: 50%; opacity: 0; pointer-events: none;
+      background: radial-gradient(circle, #fffce0 0%, #ffdb79 45%, rgba(255,185,75,0) 75%);
+      box-shadow: 0 0 22px 10px rgba(255,205,110,.5), 0 0 54px 22px rgba(255,186,81,.25);
     }
     .scene-box.released .floating-lantern {
-      opacity: 1; animation: lanternAscend 4s ease-in forwards;
+      animation: lanternLightRise 4s ease-in-out forwards;
     }
-    @keyframes lanternAscend {
-      0% { transform: translate(0,0) scale(1); opacity: 0; }
-      12% { opacity: .95; }
-      65% { opacity: 1; }
-      100% { transform: translate(38px,-540px) scale(.28) rotate(8deg); opacity: 0; }
+    @keyframes lanternLightRise {
+      0% { transform: translate(0,0) scale(.35); opacity: 0; }
+      15% { opacity: .9; }
+      50% { opacity: 1; }
+      100% { transform: translate(36px,-420px) scale(2); opacity: 0; }
     }
     .scene-box::after {
       content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -448,11 +451,11 @@
     </button>
     <h1 class="cover-title">Ana Clara</h1>
     <p class="cover-subtitle">Meus 15 Anos</p>
-    <button type="button" class="cover-hint" id="coverHintBtn">Toque no selo do Sol para abrir com música</button>
+    <button type="button" class="cover-hint" id="coverHintBtn">✨ Toque no Sol e deixe a magia começar...</button>
   </section>
 
-  <!-- Cena da Rapunzel Soltando a Lanterna -->
-  <section id="rapunzelModal" aria-label="Cena da Rapunzel">
+  <!-- Cena fotográfica da Ana Clara com a lanterna -->
+  <section id="rapunzelModal" aria-label="Cena da Ana Clara com a lanterna">
     <div class="scene-box">
       <img class="scene-photo" src="Lanterna%20dos%20Desejos%20ao%20Entardecer.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
