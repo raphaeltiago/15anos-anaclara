@@ -337,6 +337,25 @@
       .envelope-letter {font-size:13px;}
     }
 
+
+    /* Fundo da capa em tela cheia, sem faixa central */
+    #coverScreen::before {
+      inset:-18px;
+      background:
+        linear-gradient(180deg,rgba(18,7,35,.48),rgba(25,9,42,.38) 48%,rgba(18,7,35,.74)),
+        url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center 28% / cover no-repeat;
+      filter:blur(13px);
+      transform:scale(1.04);
+      animation:none;
+    }
+    @media(max-width:600px) {
+      #coverScreen::before {
+        background:
+          linear-gradient(180deg,rgba(18,7,35,.48),rgba(25,9,42,.38) 48%,rgba(18,7,35,.74)),
+          url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center 24% / cover no-repeat;
+      }
+    }
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
