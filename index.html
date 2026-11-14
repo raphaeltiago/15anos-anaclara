@@ -513,6 +513,32 @@
     #rapunzelModal .scene-caption {z-index:4;}
     #rapunzelModal .scene-box.released .scene-photo {filter:drop-shadow(0 0 25px rgba(17,7,31,.25));}
 
+
+    /* Integração visual sem emendas: bordas do retrato dissolvidas no cenário */
+    #rapunzelModal .scene-box::before {
+      inset:-35px;
+      background:url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center center / cover no-repeat;
+      filter:blur(13px) brightness(.83) saturate(1.08);
+      transform:scale(1.04);
+    }
+    #rapunzelModal .scene-photo {
+      inset:0;margin:auto;
+      width:min(100%, 78vh);
+      height:100%;
+      object-fit:cover;
+      object-position:center center;
+      -webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.25) 8%,#000 23%,#000 77%,rgba(0,0,0,.25) 92%,transparent 100%);
+      mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.25) 8%,#000 23%,#000 77%,rgba(0,0,0,.25) 92%,transparent 100%);
+      filter:none;
+    }
+    #rapunzelModal .scene-box.released .scene-photo {filter:none;}
+    @media(max-width:650px){
+      #rapunzelModal .scene-photo {
+        width:100%;height:100%;object-fit:contain;
+        -webkit-mask-image:none;mask-image:none;
+      }
+    }
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
