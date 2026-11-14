@@ -356,6 +356,15 @@
       }
     }
 
+
+    /* Fundo exclusivo do rio encantado, sem retrato */
+    #coverScreen::before {
+      inset:0;
+      background:linear-gradient(180deg,rgba(16,9,36,.36),rgba(24,10,40,.2) 50%,rgba(16,8,31,.6)),url('rio-lanternas.svg') center center / cover no-repeat;
+      filter:none;transform:scale(1.04);animation:cinematicCamera 17s ease-out both;
+    }
+    @media(max-width:600px){#coverScreen::before {background:linear-gradient(180deg,rgba(16,9,36,.38),rgba(24,10,40,.18) 50%,rgba(16,8,31,.58)),url('rio-lanternas.svg') center center / cover no-repeat;}}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
