@@ -51,7 +51,7 @@
       padding: 9px 16px;
       border-radius: 999px;
       border: 1px solid var(--gold-light);
-      background: rgba(26, 11, 46, 0.9);
+      background: rgba(26, 11, 46, 0.92);
       color: var(--gold-light);
       font-family: 'Cinzel', serif;
       font-size: 0.78rem;
@@ -87,13 +87,9 @@
       justify-content: center;
       text-align: center;
       padding: 24px;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
 
     #coverScreen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
       display: none;
     }
 
@@ -412,4 +408,405 @@
     <button type="button" class="cover-hint" id="coverHintBtn">Toque no selo do Sol para abrir com música</button>
   </section>
 
-  <!-- Cena da
+  <!-- Cena da Rapunzel Soltando a Lanterna -->
+  <section id="rapunzelModal" aria-label="Cena da Rapunzel">
+    <div class="scene-box">
+      <canvas id="sceneCanvas" width="460" height="360"></canvas>
+    </div>
+    <p class="scene-caption" id="sceneCaption">Toque em "Soltar Lanterna" para ver a Rapunzel enviar a luz ao céu.</p>
+    <div class="scene-actions">
+      <button type="button" class="btn-primary" id="releaseBtn">Soltar Lanterna</button>
+      <button type="button" class="btn-secondary" id="enterBtn">Entrar no Convite</button>
+    </div>
+  </section>
+
+  <!-- Convite Principal -->
+  <div class="container">
+    <header>
+      <p class="subtitle">Convite Especial</p>
+      <h2 class="main-title">Ana Clara</h2>
+      <p class="subtitle">15 Anos</p>
+    </header>
+
+    <div class="card">
+      <h3 class="section-title">Contagem Regressiva</h3>
+      <p class="event-datetime">10 de Janeiro de 2027 • às 19h</p>
+      <div class="countdown" id="countdown">
+        <div class="time-box"><span class="time-val" id="days">00</span><span class="time-lbl">Dias</span></div>
+        <div class="time-box"><span class="time-val" id="hours">00</span><span class="time-lbl">Horas</span></div>
+        <div class="time-box"><span class="time-val" id="minutes">00</span><span class="time-lbl">Min</span></div>
+        <div class="time-box"><span class="time-val" id="seconds">00</span><span class="time-lbl">Seg</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Traje &amp; Dress Code</h3>
+      <p style="font-size: 0.95rem; line-height: 1.55;">
+        Celebre conosco uma noite iluminada pelas lanternas de Corona.
+      </p>
+      <div class="alert-box">
+        <strong>Atenção ao Dress Code:</strong> Pedimos com carinho que os convidados <u>não utilizem roupas nas cores roxo ou lilás</u>, tons reservados exclusivamente para a debutante.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Local do Evento</h3>
+      <p id="venueName" style="font-weight: 600;">Espaço das Lanternas</p>
+      <p id="venueAddress" class="venue-address">R. do Acre, 255 - Mooca, São Paulo - SP, 03181-100</p>
+      <div class="btn-group">
+        <a id="googleMapsLink" href="https://www.google.com/maps/search/?api=1&query=R.+do+Acre%2C+255+-+Mooca%2C+S%C3%A3o+Paulo+-+SP%2C+03181-100" target="_blank" rel="noopener noreferrer" class="btn-map">Google Maps</a>
+        <a id="wazeLink" href="https://waze.com/ul?q=R.%20do%20Acre%2C%20255%20-%20Mooca%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2003181-100" target="_blank" rel="noopener noreferrer" class="btn-map">Waze</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Confirmação de Presença</h3>
+      <form id="rsvpForm">
+        <div>
+          <label for="guestName">Nome Completo</label>
+          <input id="guestName" type="text" required placeholder="Digite seu nome">
+        </div>
+        <div>
+          <label for="guestStatus">Você irá ao evento?</label>
+          <select id="guestStatus" required>
+            <option value="sim">Sim, estarei presente!</option>
+            <option value="nao">Infelizmente não poderei ir</option>
+          </select>
+        </div>
+        <div>
+          <label for="guestCount">Quantidade de Acompanhantes</label>
+          <input id="guestCount" type="number" min="0" max="5" value="0">
+        </div>
+        <button type="submit" class="btn-primary">Confirmar Presença</button>
+      </form>
+      <p class="rsvp-feedback" id="rsvpFeedback"></p>
+    </div>
+
+    <footer>15 Anos de Ana Clara • Reino de Corona</footer>
+  </div>
+
+  <script>
+    (function () {
+      const EVENT_CONFIG = {
+        venueName: 'Espaço das Lanternas',
+        address: 'R. do Acre, 255 - Mooca, São Paulo - SP, 03181-100',
+        dateIso: '2027-01-10T19:00:00-03:00'
+      };
+
+      function drawRoundedRect(ctx, x, y, w, h, r) {
+        const radius = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
+
+      /* Trilha Nativa Temática da Rapunzel (Web Audio API) */
+      const rapunzelMelody = [
+        { freq: 392.00, dur: 0.55 },
+        { freq: 493.88, dur: 0.55 },
+        { freq: 587.33, dur: 0.75 },
+        { freq: 659.25, dur: 0.85 },
+        { freq: 587.33, dur: 0.50 },
+        { freq: 493.88, dur: 0.65 },
+        { freq: 440.00, dur: 0.90 },
+        { freq: 392.00, dur: 0.55 },
+        { freq: 493.88, dur: 0.55 },
+        { freq: 587.33, dur: 0.70 },
+        { freq: 739.99, dur: 0.80 },
+        { freq: 659.25, dur: 1.10 },
+        { freq: 587.33, dur: 0.65 },
+        { freq: 493.88, dur: 1.20 }
+      ];
+
+      let audioCtx = null;
+      let musicPlaying = false;
+      let melodyTimer = null;
+      let noteIndex = 0;
+
+      function playNote(freq, duration) {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      }
+
+      function startRapunzelMusic() {
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          if (!audioCtx) audioCtx = new AudioCtx();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          if (musicPlaying) return;
+
+          musicPlaying = true;
+          const btn = document.getElementById('musicToggleBtn');
+          if (btn) btn.textContent = '♪ Música: On';
+
+          function step() {
+            if (!musicPlaying) return;
+            const note = rapunzelMelody[noteIndex % rapunzelMelody.length];
+            playNote(note.freq, note.dur);
+            noteIndex += 1;
+            melodyTimer = setTimeout(step, note.dur * 950);
+          }
+          step();
+        } catch (_) {}
+      }
+
+      function stopRapunzelMusic() {
+        musicPlaying = false;
+        if (melodyTimer) clearTimeout(melodyTimer);
+        const btn = document.getElementById('musicToggleBtn');
+        if (btn) btn.textContent = '♪ Música: Off';
+      }
+
+      function toggleRapunzelMusic() {
+        if (musicPlaying) stopRapunzelMusic();
+        else startRapunzelMusic();
+      }
+
+      function openRapunzelScene() {
+        const cover = document.getElementById('coverScreen');
+        const modal = document.getElementById('rapunzelModal');
+        if (cover) cover.classList.add('hidden');
+        if (modal) modal.classList.add('active');
+        startRapunzelMusic();
+      }
+
+      function enterInvitation() {
+        const cover = document.getElementById('coverScreen');
+        const modal = document.getElementById('rapunzelModal');
+        if (cover) cover.classList.add('hidden');
+        if (modal) modal.classList.remove('active');
+        startRapunzelMusic();
+      }
+
+      const bgCanvas = document.getElementById('lanternCanvas');
+      const bgCtx = bgCanvas ? bgCanvas.getContext('2d') : null;
+      let bgLanterns = [];
+
+      function resizeBg() {
+        if (!bgCanvas) return;
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+      }
+
+      function initBgLanterns() {
+        if (!bgCanvas || !bgCtx) return;
+        resizeBg();
+        bgLanterns = [];
+        for (let i = 0; i < 28; i++) {
+          const w = Math.random() * 10 + 9;
+          bgLanterns.push({
+            x: Math.random() * bgCanvas.width,
+            y: Math.random() * bgCanvas.height,
+            w: w,
+            h: w * 1.35,
+            vy: Math.random() * 0.5 + 0.25,
+            phase: Math.random() * Math.PI * 2,
+            alpha: Math.random() * 0.4 + 0.35
+          });
+        }
+
+        function animateBg() {
+          bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+          bgLanterns.forEach((l) => {
+            l.y -= l.vy;
+            l.phase += 0.02;
+            l.x += Math.sin(l.phase) * 0.35;
+            if (l.y < -40) {
+              l.y = bgCanvas.height + 20;
+              l.x = Math.random() * bgCanvas.width;
+            }
+            bgCtx.save();
+            bgCtx.globalAlpha = l.alpha;
+            bgCtx.fillStyle = '#f3e5ab';
+            drawRoundedRect(bgCtx, l.x, l.y, l.w, l.h, 3);
+            bgCtx.fill();
+            bgCtx.restore();
+          });
+          requestAnimationFrame(animateBg);
+        }
+        animateBg();
+      }
+
+      const sceneCanvas = document.getElementById('sceneCanvas');
+      const sCtx = sceneCanvas ? sceneCanvas.getContext('2d') : null;
+      const rapunzelState = {
+        released: false,
+        lanternX: 255,
+        lanternY: 205,
+        driftPhase: 0,
+        skyLanterns: Array.from({ length: 14 }, () => ({
+          x: Math.random() * 420 + 20,
+          y: Math.random() * 300 + 20,
+          size: Math.random() * 6 + 5,
+          speed: Math.random() * 0.35 + 0.18
+        }))
+      };
+
+      function releaseRapunzelLantern() {
+        rapunzelState.released = true;
+        const caption = document.getElementById('sceneCaption');
+        if (caption) caption.textContent = '"Vejo enfim a luz brilhar..."';
+        startRapunzelMusic();
+      }
+
+      function initRapunzelScene() {
+        if (!sceneCanvas || !sCtx) return;
+        const w = sceneCanvas.width;
+        const h = sceneCanvas.height;
+
+        function drawScene() {
+          const sky = sCtx.createLinearGradient(0, 0, 0, h);
+          sky.addColorStop(0, '#120624');
+          sky.addColorStop(0.55, '#2a123d');
+          sky.addColorStop(1, '#9370DB');
+          sCtx.fillStyle = sky;
+          sCtx.fillRect(0, 0, w, h);
+
+          sCtx.fillStyle = '#f7e7ce';
+          for (let i = 0; i < 28; i++) {
+            const sx = (i * 73) % w;
+            const sy = (i * 41) % (h * 0.65);
+            sCtx.globalAlpha = 0.4 + ((i % 5) * 0.12);
+            sCtx.beginPath();
+            sCtx.arc(sx, sy, (i % 2) + 1, 0, Math.PI * 2);
+            sCtx.fill();
+          }
+          sCtx.globalAlpha = 1;
+
+          rapunzelState.skyLanterns.forEach((item) => {
+            item.y -= item.speed;
+            if (item.y < -15) item.y = h + 15;
+            sCtx.save();
+            sCtx.globalAlpha = 0.65;
+            sCtx.fillStyle = '#f3e5ab';
+            drawRoundedRect(sCtx, item.x, item.y, item.size, item.size * 1.3, 2);
+            sCtx.fill();
+            sCtx.restore();
+          });
+
+          sCtx.fillStyle = '#160829';
+          drawRoundedRect(sCtx, 290, 150, 145, 210, 12);
+          sCtx.fill();
+
+          sCtx.fillStyle = '#240d3d';
+          sCtx.beginPath();
+          sCtx.arc(355, 225, 42, Math.PI, 0);
+          sCtx.lineTo(397, 295);
+          sCtx.lineTo(313, 295);
+          sCtx.closePath();
+          sCtx.fill();
+
+          sCtx.fillStyle = '#0e041c';
+          sCtx.beginPath();
+          sCtx.arc(325, 222, 13, 0, Math.PI * 2);
+          sCtx.fill();
+          sCtx.beginPath();
+          sCtx.moveTo(312, 235);
+          sCtx.quadraticCurveTo(325, 265, 338, 235);
+          sCtx.lineTo(344, 295);
+          sCtx.lineTo(306, 295);
+          sCtx.closePath();
+          sCtx.fill();
+
+          sCtx.strokeStyle = '#d4af37';
+          sCtx.lineWidth = 5;
+          sCtx.beginPath();
+          sCtx.moveTo(318, 232);
+          sCtx.bezierCurveTo(295, 275, 340, 315, 312, 358);
+          sCtx.stroke();
+
+          if (rapunzelState.released) {
+            rapunzelState.driftPhase += 0.03;
+            rapunzelState.lanternY -= 0.95;
+            rapunzelState.lanternX += Math.sin(rapunzelState.driftPhase) * 0.55;
+            if (rapunzelState.lanternY < -30) {
+              rapunzelState.lanternY = 215;
+              rapunzelState.lanternX = 255;
+            }
+          }
+
+          sCtx.save();
+          sCtx.fillStyle = '#f3e5ab';
+          drawRoundedRect(sCtx, rapunzelState.lanternX, rapunzelState.lanternY, 18, 24, 4);
+          sCtx.fill();
+          sCtx.restore();
+
+          requestAnimationFrame(drawScene);
+        }
+        drawScene();
+      }
+
+      function initCountdown() {
+        const partyDate = new Date(EVENT_CONFIG.dateIso).getTime();
+        function update() {
+          const diff = Math.max(0, partyDate - Date.now());
+          document.getElementById('days').textContent = String(Math.floor(diff / 86400000)).padStart(2, '0');
+          document.getElementById('hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+          document.getElementById('minutes').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+          document.getElementById('seconds').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+        }
+        update();
+        setInterval(update, 1000);
+      }
+
+      function initVenue() {
+        document.getElementById('venueName').textContent = EVENT_CONFIG.venueName;
+        document.getElementById('venueAddress').textContent = EVENT_CONFIG.address;
+        const query = encodeURIComponent(EVENT_CONFIG.address);
+        document.getElementById('googleMapsLink').href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+        document.getElementById('wazeLink').href = `https://waze.com/ul?q=${query}`;
+      }
+
+      function initRSVP() {
+        const form = document.getElementById('rsvpForm');
+        if (!form) return;
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          const name = document.getElementById('guestName').value.trim();
+          const status = document.getElementById('guestStatus').value;
+          const feedback = document.getElementById('rsvpFeedback');
+          feedback.textContent = status === 'sim'
+            ? `Presença confirmada para ${name}! Nos vemos dia 10/01/2027 às 19h no Reino de Corona.`
+            : `Resposta registrada para ${name}. Obrigado por avisar!`;
+        });
+      }
+
+      function bindEvents() {
+        window.addEventListener('resize', resizeBg);
+        document.getElementById('sunSealBtn').addEventListener('click', openRapunzelScene);
+        document.getElementById('coverHintBtn').addEventListener('click', openRapunzelScene);
+        document.getElementById('releaseBtn').addEventListener('click', releaseRapunzelLantern);
+        document.getElementById('enterBtn').addEventListener('click', enterInvitation);
+        document.getElementById('musicToggleBtn').addEventListener('click', toggleRapunzelMusic);
+      }
+
+      function boot() {
+        initVenue();
+        initCountdown();
+        initRSVP();
+        initBgLanterns();
+        initRapunzelScene();
+        bindEvents();
+      }
+
+      if (document.
