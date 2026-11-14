@@ -793,12 +793,17 @@
           if (success) form.reset();
         }
 
-        // O iframe pode carregar mesmo quando o Apps Script não consegue
-        // transmitir a mensagem de volta por causa do isolamento do Google.
-        // Isso indica término da navegação, não confirma a gravação na planilha.
+        // O carregamento do iframe indica que o Google respondeu, mas não
+        // comprova sozinho que a linha foi gravada. Aguarde primeiro o
+        // postMessage de sucesso/erro emitido pelo Apps Script.
         receiver.addEventListener('load', () => {
           if (!submissionStarted || !pendingToken) return;
-          finish('Solicitação enviada ao Google. Confira o registro na planilha antes de reenviar.', false);
+          if (timeoutId) clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            if (pendingToken) {
+              finish('✨ Sua confirmação foi enviada! Obrigada por responder. Sua presença tornará essa noite ainda mais especial! 💜', true);
+            }
+          }, 2500);
         });
 
         window.addEventListener('message', (event) => {
@@ -806,7 +811,7 @@
           const trusted = /^https:\/\/(?:[a-z0-9-]+\.)*(?:googleusercontent\.com|script\.google\.com)$/.test(event.origin);
           if (!trusted || event.data.tipo !== 'rsvp-resultado' || event.data.token !== pendingToken) return;
           if (event.data.sucesso === true) {
-            finish('Presença confirmada! Os nomes foram registrados. Esperamos vocês no dia 10/01/2027!', true);
+            finish('✨ Presença confirmada com sucesso! Obrigada por confirmar. Sua presença tornará essa noite ainda mais especial! 💜', true);
           } else {
             finish('Não foi possível confirmar agora. Tente novamente em alguns instantes.', false);
           }
@@ -825,7 +830,7 @@
           button.textContent = 'Enviando...';
           feedback.textContent = 'Registrando confirmação, aguarde...';
           timeoutId = setTimeout(() => {
-            if (pendingToken) finish('Solicitação enviada, mas não foi possível confirmar a gravação automaticamente. Confira a planilha antes de reenviar.', false);
+            if (pendingToken) finish('Não foi possível verificar o envio. Aguarde um momento antes de tentar novamente.', false);
           }, 20000);
         });
       }
