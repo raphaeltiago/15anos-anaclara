@@ -847,7 +847,33 @@
       color: var(--lavender);
       opacity: 0.85;
     }
-  </style>
+  
+    /* Correção final de precedência: manter imagem visível e envelope sem salto */
+    #rapunzelModal .scene-box {position:absolute;inset:0;width:100%;height:100%;max-width:none;padding:0;overflow:hidden;}
+    #rapunzelModal .scene-box::before {display:none!important;}
+    #rapunzelModal .scene-photo {
+      display:block!important;position:absolute;inset:0;
+      width:100%;height:100%;max-width:none;
+      object-fit:cover;object-position:center;
+      opacity:1;visibility:visible;
+      -webkit-mask-image:none;mask-image:none;filter:none;
+    }
+    #rapunzelModal.active .scene-photo {animation:none;transform:none;}
+    #rapunzelModal .scene-caption {display:none;}
+    #coverScreen .envelope-button {transform:none!important;perspective:none;transform-style:flat;}
+    #coverScreen .envelope-flap {
+      transform:none;opacity:1;transition:clip-path 1.1s ease,opacity .45s ease 1.05s;
+      clip-path:polygon(0 0,100% 0,50% 100%);
+    }
+    #coverScreen.opening .envelope-flap {
+      transform:none;clip-path:polygon(0 0,100% 0,50% 0);opacity:0;
+    }
+    #coverScreen .envelope-letter {transform:translateY(0);transition:transform 1.7s cubic-bezier(.22,.7,.2,1) 1.05s;}
+    #coverScreen.opening .envelope-letter {transform:translateY(-72px);}
+    #coverScreen.opening .envelope-intro {opacity:1!important;transform:none!important;}
+    #coverScreen.opening.crossfade .envelope-intro {opacity:0!important;transition:opacity 1.8s ease!important;}
+
+</style>
 </head>
 <body>
 
@@ -879,7 +905,7 @@
   <!-- Cena fotográfica da Ana Clara com a lanterna -->
   <section id="rapunzelModal" aria-label="Cena da Ana Clara com a lanterna">
     <div class="scene-box">
-      <img class="scene-photo" src="Luz%20de%20Ver%C3%A3o%20no%20Lago.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
+      <img class="scene-photo" src="./Luz%20de%20Ver%C3%A3o%20no%20Lago.png?v=2" onerror="this.onerror=null;this.src='./Lanterna%20dos%20Desejos%20ao%20Entardecer.png';" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
       <div class="floating-lantern" aria-hidden="true"></div>
 
