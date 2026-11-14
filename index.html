@@ -491,6 +491,28 @@
     #rapunzelModal .scene-box {height:100%;max-height:none;}
     @media(max-width:600px){.envelope-button{margin-top:26px;}#coverScreen.opening .envelope-letter{transform:translateY(-60px);}}
 
+
+    /* Fotografia em tela cheia: fundo ampliado e desfocado + retrato completo */
+    #rapunzelModal .scene-box {overflow:hidden;}
+    #rapunzelModal .scene-box::before {
+      display:block;content:"";position:absolute;inset:-25px;
+      background:url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center center / cover no-repeat;
+      filter:blur(22px) brightness(.55);
+      transform:scale(1.08);
+      backdrop-filter:none;
+      z-index:0;
+    }
+    #rapunzelModal .scene-photo {
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:contain;object-position:center center;
+      z-index:1;
+      filter:drop-shadow(0 0 25px rgba(17,7,31,.25));
+    }
+    #rapunzelModal .photo-vignette {position:absolute;inset:0;z-index:2;pointer-events:none;}
+    #rapunzelModal .floating-lantern {z-index:3;}
+    #rapunzelModal .scene-caption {z-index:4;}
+    #rapunzelModal .scene-box.released .scene-photo {filter:drop-shadow(0 0 25px rgba(17,7,31,.25));}
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -877,7 +899,7 @@
       <p class="rsvp-feedback" id="rsvpFeedback"></p>
     </div>
 
-    <footer>15 Anos de Ana Clara • Reino de Corona</footer>
+    <footer>15 Anos de Ana Clara</footer>
   </div>
 
   <script>
