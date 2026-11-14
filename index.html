@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>15 Anos - Ana Clara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #1a0b2e;
+      --bg-medium: #2a123d;
+      --plum-accent: #3d1c47;
+      --medium-purple: #9370DB;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --lavender: #e6d7ff;
+      --champagne: #f7e7ce;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at top, var(--plum-accent) 0%, var(--bg-dark) 65%, #0f051d 100%);
+      color: var(--champagne);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    #lanternCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .music-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 140;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--gold-light);
+      background: rgba(26, 11, 46, 0.9);
+      color: var(--gold-light);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .music-toggle:hover {
+      transform: translateY(-1px);
+      background: var(--medium-purple);
+      color: var(--white);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 56px 20px 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Tela de Capa */
+    #coverScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, var(--medium-purple) 0%, var(--bg-medium) 45%, #120621 100%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #coverScreen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      display: none;
+    }
+
+    .sun-seal {
+      width: 118px;
+      height: 118px;
+      background: radial-gradient(circle, var(--gold-light), var(--gold));
+      border: 3px solid var(--champagne);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 32px rgba(212, 175, 55, 0.65);
+      cursor: pointer;
+      animation: pulse 2.2s infinite ease-in-out;
+      margin-bottom: 24px;
+    }
+
+    .sun-seal svg {
+      width: 66px;
+      height: 66px;
+      fill: var(--bg-dark);
+      pointer-events: none;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+      50% { transform: scale(1.07); box-shadow: 0 0 42px rgba(243, 229, 171, 0.85); }
+      100% { transform: scale(1); box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+    }
+
+    .cover-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.4rem;
+      color: var(--gold-light);
+      text-shadow: 0 0 14px rgba(243, 229, 171, 0.45);
+      margin-bottom: 6px;
+    }
+
+    .cover-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      letter-spacing: 3px;
+      color: var(--lavender);
+      text-transform: uppercase;
+    }
+
+    .cover-hint {
+      margin-top: 18px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(243, 229, 171, 0.45);
+      background: rgba(26, 11, 46, 0.45);
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      cursor: pointer;
+    }
+
+    /* Cena da Rapunzel Soltando a Lanterna */
+    #rapunzelModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 5, 23, 0.96);
+      z-index: 120;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #rapunzelModal.active {
+      display: flex;
+    }
+
+    .scene-box {
+      width: 100%;
+      max-width: 460px;
+      height: 360px;
+      border: 2px solid var(--gold);
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 36px rgba(147, 112, 219, 0.45);
+      background: #120624;
+    }
+
+    #sceneCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .scene-caption {
+      margin-top: 18px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      color: var(--gold-light);
+      text-align: center;
+      min-height: 28px;
+    }
+
+    .scene-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      padding: 12px 24px;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--bg-dark);
+      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.45);
+    }
+
+    .btn-secondary {
+      background: var(--medium-purple);
+      color: var(--white);
+      border: 1px solid var(--gold-light);
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Conteúdo Principal */
+    header {
+      text-align: center;
+      padding: 20px 0 24px;
+    }
+
+    .main-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: 4.1rem;
+      color: var(--gold-light);
+      line-height: 1.05;
+      text-shadow: 0 0 18px rgba(147, 112, 219, 0.55);
+    }
+
+    .subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      letter-spacing: 3.5px;
+      color: var(--lavender);
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: rgba(42, 18, 61, 0.85);
+      border: 1px solid var(--medium-purple);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 22px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      color: var(--gold-light);
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .event-datetime {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      color: var(--gold-light);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .time-box {
+      background: rgba(26, 11, 46, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 12px;
+      padding: 12px 6px;
+    }
+
+    .time-val {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      display: block;
+    }
+
+    .time-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--lavender);
+    }
+
+    .alert-box {
+      background: rgba(147, 112, 219, 0.2);
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 14px;
+      color: var(--champagne);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .venue-address {
+      font-size: 0.92rem;
+      color: var(--lavender);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .btn-map {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      background: var(--plum-accent);
+      color: var(--champagne);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .btn-map:hover {
+      background: var(--gold);
+      color: var(--bg-dark);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 12px;
+      text-align: left;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--lavender);
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--medium-purple);
+      background: rgba(26, 11, 46, 0.92);
+      color: var(--white);
+      font-size: 0.95rem;
+    }
+
+    .rsvp-feedback {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: var(--gold-light);
+      min-height: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 18px 0 8px;
+      font-size: 0.8rem;
+      color: var(--lavender);
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <button type="button" class="music-toggle" id="musicToggleBtn">♪ Música: Off</button>
+
+  <canvas id="lanternCanvas"></canvas>
+
+  <!-- Capa Inicial -->
+  <section id="coverScreen" aria-label="Capa do Convite">
+    <button type="button" class="sun-seal" id="sunSealBtn" aria-label="Abrir convite">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2L14.5 8.5L21 9L16 13.5L18 20L12 16L6 20L8 13.5L3 9L9.5 8.5L12 2Z"/>
+      </svg>
+    </button>
+    <h1 class="cover-title">Ana Clara</h1>
+    <p class="cover-subtitle">Meus 15 Anos</p>
+    <button type="button" class="cover-hint" id="coverHintBtn">Toque no selo do Sol para abrir com música</button>
+  </section>
+
+  <!-- Cena da
