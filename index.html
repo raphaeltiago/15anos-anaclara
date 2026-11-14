@@ -539,6 +539,27 @@
       }
     }
 
+
+    /* Imagem panorâmica definitiva: sem emendas nem máscaras */
+    #rapunzelModal .scene-box {overflow:hidden;background:#171027;}
+    #rapunzelModal .scene-box::before {display:none!important;}
+    #rapunzelModal .scene-photo,
+    #rapunzelModal .scene-box.released .scene-photo {
+      display:block;position:absolute;inset:0;margin:0;
+      width:100%;height:100%;max-width:none;
+      object-fit:cover;object-position:center center;
+      -webkit-mask-image:none;mask-image:none;
+      filter:none;
+    }
+    #rapunzelModal.active .scene-photo {animation:lakeCamera 7.8s cubic-bezier(.2,.6,.2,1) both;}
+    #rapunzelModal .photo-vignette {background:linear-gradient(180deg,transparent 68%,rgba(15,8,28,.32));}
+    @media(max-width:650px){
+      #rapunzelModal .scene-photo,#rapunzelModal .scene-box.released .scene-photo {
+        width:100%;height:100%;object-fit:cover;object-position:center center;
+        -webkit-mask-image:none;mask-image:none;
+      }
+    }
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -858,7 +879,7 @@
   <!-- Cena fotográfica da Ana Clara com a lanterna -->
   <section id="rapunzelModal" aria-label="Cena da Ana Clara com a lanterna">
     <div class="scene-box">
-      <img class="scene-photo" src="Lanterna%20dos%20Desejos%20ao%20Entardecer.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
+      <img class="scene-photo" src="Luz%20de%20Ver%C3%A3o%20no%20Lago.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
       <div class="floating-lantern" aria-hidden="true"></div>
 
