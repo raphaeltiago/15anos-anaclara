@@ -307,6 +307,36 @@
     @keyframes inviteFocus {from{filter:blur(10px) brightness(1.7);opacity:.4;transform:translateY(16px)}to{filter:none;opacity:1;transform:none}}
     @media(prefers-reduced-motion:reduce){.cinematic-wash{display:none}body.invite-emerging .container{animation:none}}
 
+
+    /* Ajustes: leitura da carta e enquadramento completo da Ana Clara */
+    #coverScreen::before {
+      background:
+        linear-gradient(180deg,rgba(18,7,35,.52),rgba(25,9,42,.32) 45%,rgba(18,7,35,.78)),
+        url('Lanterna%20dos%20Desejos%20ao%20Entardecer.png') center center / contain no-repeat,
+        #29183a;
+      filter:blur(10px);
+      transform:scale(1.025);
+      animation:none;
+    }
+    .envelope-letter {
+      z-index:1;
+      transition:transform 2.1s cubic-bezier(.22,.7,.25,1) .55s;
+      font-size:14px;
+      letter-spacing:1px;
+      line-height:1.55;
+      padding-top:15px;
+    }
+    .envelope-front {z-index:2;}
+    .envelope-flap {z-index:3;transition:transform 1.55s cubic-bezier(.2,.7,.2,1);}
+    #coverScreen.opening .envelope-letter {transform:translateY(-112px);}
+    #coverScreen.opening .envelope-intro {transition:opacity 1.2s ease 3.7s,transform 1.2s ease 3.7s;}
+    #coverScreen.opening .opening-glow {animation:none;}
+    #coverScreen.opening .envelope-button {transform:rotate(0) scale(1.04);}
+    @media(max-width:600px) {
+      #coverScreen::before {background-size:auto,contain,auto;background-position:center,center,center;}
+      .envelope-letter {font-size:13px;}
+    }
+
     /* Cena da Rapunzel Soltando a Lanterna */
     #rapunzelModal {
       position: fixed;
@@ -615,10 +645,10 @@
       <h1 class="envelope-title">Ana Clara</h1>
       <p class="envelope-subtitle">MEUS 15 ANOS</p>
       <button class="envelope-button" type="button" id="sunSealBtn" aria-label="Abrir o envelope do convite">
-        <span class="envelope-back"></span><span class="envelope-letter">Você está convidado ✦</span>
+        <span class="envelope-back"></span><span class="envelope-letter">Um convite especial para você ✦</span>
         <span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">✦</span>
       </button>
-      <button class="envelope-hint" type="button" id="coverHintBtn">✉ Toque no envelope para abrir</button>
+      <button class="envelope-hint" type="button" id="coverHintBtn">✉ Uma surpresa espera por você</button>
     </div>
     <div class="opening-glow" aria-hidden="true"></div>
   </section>
@@ -802,11 +832,12 @@
         if (cover) cover.classList.add('opening');
         const wash = document.getElementById('cinematicWash');
         // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
-        setTimeout(() => { if (wash) wash.classList.add('bloom'); }, 550);
-        setTimeout(() => { if (modal) modal.classList.add('active'); }, 1050);
-        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 1450);
-        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 3600);
-        setTimeout(releaseRapunzelLantern, 3900);
+        // A carta fica visível por alguns segundos antes da passagem luminosa.
+        setTimeout(() => { if (wash) wash.classList.add('bloom'); }, 3800);
+        setTimeout(() => { if (modal) modal.classList.add('active'); }, 4400);
+        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
+        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
+        setTimeout(releaseRapunzelLantern, 7050);
       }
 
       function enterInvitation() {
