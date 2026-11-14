@@ -182,11 +182,45 @@
       background: #120624;
     }
 
-    #sceneCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
+    #sceneCanvas { display: none; }
+    .scene-box { height: min(66vh, 540px); max-width: 410px; }
+    .scene-photo {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center 43%;
+      transition: transform 4.8s ease, filter 4.8s ease;
     }
+    .scene-box.released .scene-photo { transform: scale(1.12); filter: brightness(0.72); }
+    .photo-vignette {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to top, rgba(19,5,38,.48), transparent 35%),
+                  radial-gradient(ellipse at center, transparent 42%, rgba(18,6,36,.25));
+    }
+    .floating-lantern {
+      position: absolute; left: 52%; top: 49%; width: 25%; aspect-ratio: .85;
+      border-radius: 14% 14% 22% 22%;
+      background: radial-gradient(ellipse at 50% 65%, #fff6bf 0%, #ffd86d 38%, #e7a748 85%);
+      box-shadow: 0 0 25px 8px rgba(255,193,81,.45), inset 0 -8px 12px rgba(144,69,22,.2);
+      opacity: 0; pointer-events: none;
+    }
+    .floating-lantern::after {
+      content: '✦'; position: absolute; top: 24%; left: 0; width: 100%;
+      text-align: center; font-size: 2rem; color: rgba(150,80,30,.55);
+    }
+    .scene-box.released .floating-lantern {
+      opacity: 1; animation: lanternAscend 4s ease-in forwards;
+    }
+    @keyframes lanternAscend {
+      0% { transform: translate(0,0) scale(1); opacity: 0; }
+      12% { opacity: .95; }
+      65% { opacity: 1; }
+      100% { transform: translate(38px,-540px) scale(.28) rotate(8deg); opacity: 0; }
+    }
+    .scene-box::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(circle at 65% 48%, rgba(255,218,135,.22), transparent 35%);
+      opacity: 0; transition: opacity 1s ease;
+    }
+    .scene-box.released::after { opacity: 1; }
 
     .scene-caption {
       margin-top: 18px;
@@ -420,9 +454,11 @@
   <!-- Cena da Rapunzel Soltando a Lanterna -->
   <section id="rapunzelModal" aria-label="Cena da Rapunzel">
     <div class="scene-box">
-      <canvas id="sceneCanvas" width="460" height="360"></canvas>
+      <img class="scene-photo" src="Lanterna%20dos%20Desejos%20ao%20Entardecer.png" alt="Ana Clara segurando uma lanterna dourada diante de um lago ao entardecer">
+      <div class="photo-vignette" aria-hidden="true"></div>
+      <div class="floating-lantern" aria-hidden="true"></div>
     </div>
-    <p class="scene-caption" id="sceneCaption">Toque em "Soltar Lanterna" para ver a Rapunzel enviar a luz ao céu.</p>
+    <p class="scene-caption" id="sceneCaption">Toque em “Soltar Lanterna” e deixe seu desejo iluminar o céu.</p>
     <div class="scene-actions">
       <button type="button" class="btn-primary" id="releaseBtn">Soltar Lanterna</button>
     </div>
@@ -677,6 +713,7 @@
         if (rapunzelState.released || rapunzelState.entering) return;
         rapunzelState.released = true;
         rapunzelState.releaseStartedAt = performance.now();
+        document.querySelector('.scene-box')?.classList.add('released');
         const releaseBtn = document.getElementById('releaseBtn');
         if (releaseBtn) {
           releaseBtn.disabled = true;
