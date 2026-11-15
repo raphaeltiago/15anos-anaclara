@@ -989,27 +989,16 @@
     #rapunzelModal.video-ready .invitation-transition-video {display:block;}
     #rapunzelModal.video-ready .scene-photo,#rapunzelModal.video-ready .photo-vignette,#rapunzelModal.video-ready .floating-lantern,#rapunzelModal.video-ready .scene-caption {display:none!important;}
 
-    /* Fundo original: extensão do próprio vídeo suavemente desfocada, azul noturno e luzes douradas. */
-    #rapunzelModal .scene-box {background:linear-gradient(180deg,#111a3a 0%,#1b2852 48%,#0d1b39 100%)!important;overflow:hidden;}
-    #rapunzelModal .invitation-backdrop-video {
-      display:none;position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;
-      filter:blur(25px) brightness(.48) saturate(1.05);transform:scale(1.08);z-index:2;
-    }
-    #rapunzelModal.video-ready .invitation-backdrop-video {display:block!important;}
-    #rapunzelModal .invitation-lights {
-      display:none;position:absolute;inset:0;z-index:8;pointer-events:none;
-      background:
-        radial-gradient(ellipse 12px 20px at 12% 10%,rgba(255,218,127,.95),transparent 95%),
-        radial-gradient(ellipse 8px 14px at 80% 15%,rgba(255,225,159,.9),transparent 95%),
-        radial-gradient(ellipse 13px 21px at 28% 88%,rgba(255,194,98,.85),transparent 95%),
-        radial-gradient(ellipse 9px 16px at 89% 77%,rgba(255,229,150,.85),transparent 95%),
-        radial-gradient(ellipse 7px 12px at 62% 5%,rgba(255,220,145,.85),transparent 95%),
-        radial-gradient(ellipse 12px 18px at 65% 94%,rgba(255,202,107,.8),transparent 95%);
-      filter:drop-shadow(0 0 13px rgba(255,199,95,.7));
-      animation:ambientLanterns 6s ease-in-out infinite alternate;
-    }
-    #rapunzelModal.video-ready .invitation-lights {display:block;}
-    @keyframes ambientLanterns {from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:translateY(-12px)}}
+    /* Versão vertical aprovada: céu noturno e lanternas flutuantes em volta do vídeo inteiro. */
+    #rapunzelModal .scene-box {background:linear-gradient(180deg,#0c1735,#172a4d 50%,#0a1630)!important;overflow:hidden;}
+    #rapunzelModal .invitation-backdrop-video {display:none!important;}
+    #rapunzelModal.video-ready .invitation-backdrop-video {display:none!important;}
+    #rapunzelModal .invitation-lights {display:none!important;}
+    #rapunzelModal .vertical-lanterns {position:absolute;inset:0;z-index:7;overflow:hidden;pointer-events:none;}
+    #rapunzelModal .vertical-lantern {position:absolute;left:var(--x);top:var(--y);width:var(--w);height:calc(var(--w)*1.55);border-radius:44% 44% 30% 30%;background:linear-gradient(90deg,#c97627,#ffdc80 35%,#fff0b6 55%,#d98b36);box-shadow:0 0 15px 5px #e7a14c88,0 0 40px 13px #e7a14c33;opacity:var(--o);animation:verticalLanternRise var(--d) linear infinite;animation-delay:var(--delay);}
+    #rapunzelModal .vertical-lantern::after {content:"";position:absolute;bottom:-2px;left:30%;width:40%;height:3px;background:#ffed9d;}
+    @keyframes verticalLanternRise {from{transform:translateY(22vh) scale(.85)}to{transform:translateY(-120vh) scale(1.08)}}
+    @media(prefers-reduced-motion:reduce){#rapunzelModal .vertical-lantern{animation:none;}}
     #rapunzelModal .invitation-transition-video {
       object-fit:contain!important;background:transparent!important;z-index:9;
     }
@@ -1080,6 +1069,20 @@
     <div class="scene-box">
       <video id="invitationBackdropVideo" class="invitation-backdrop-video" playsinline muted preload="auto" aria-hidden="true" tabindex="-1"><source src="./ana-clara-video-final.mp4?v=20261115b" type="video/mp4"></video>
       <div class="invitation-lights" aria-hidden="true"></div>
+      <div class="vertical-lanterns" aria-hidden="true">
+        <span class="vertical-lantern" style="--x:7%;--y:8%;--w:14px;--o:0.75;--d:13s;--delay:-4s"></span>
+        <span class="vertical-lantern" style="--x:22%;--y:24%;--w:8px;--o:0.5;--d:17s;--delay:-11s"></span>
+        <span class="vertical-lantern" style="--x:81%;--y:12%;--w:15px;--o:0.7;--d:15s;--delay:-6s"></span>
+        <span class="vertical-lantern" style="--x:93%;--y:35%;--w:9px;--o:0.7;--d:19s;--delay:-9s"></span>
+        <span class="vertical-lantern" style="--x:11%;--y:72%;--w:13px;--o:0.8;--d:14s;--delay:-8s"></span>
+        <span class="vertical-lantern" style="--x:86%;--y:79%;--w:11px;--o:0.6;--d:16s;--delay:-4s"></span>
+        <span class="vertical-lantern" style="--x:34%;--y:5%;--w:6px;--o:0.5;--d:21s;--delay:-14s"></span>
+        <span class="vertical-lantern" style="--x:66%;--y:90%;--w:10px;--o:0.65;--d:18s;--delay:-10s"></span>
+        <span class="vertical-lantern" style="--x:4%;--y:48%;--w:7px;--o:0.4;--d:20s;--delay:-12s"></span>
+        <span class="vertical-lantern" style="--x:96%;--y:57%;--w:7px;--o:0.55;--d:15s;--delay:-7s"></span>
+        <span class="vertical-lantern" style="--x:45%;--y:85%;--w:6px;--o:0.4;--d:22s;--delay:-16s"></span>
+        <span class="vertical-lantern" style="--x:76%;--y:49%;--w:6px;--o:0.5;--d:19s;--delay:-12s"></span>
+      </div>
       <video id="invitationTransitionVideo" class="invitation-transition-video" playsinline muted preload="auto" aria-label="Animação das lanternas antes do convite">
         <source src="./ana-clara-video-final.mp4?v=20261115b" type="video/mp4">
       </video>
