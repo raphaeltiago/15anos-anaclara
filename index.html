@@ -1248,51 +1248,58 @@
         envelopeOpening = true;
         const cover = document.getElementById('coverScreen');
         const modal = document.getElementById('rapunzelModal');
-        startRapunzelMusic();
-        if (cover) cover.classList.add('opening');
         const wash = document.getElementById('cinematicWash');
-        // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
-        // A carta fica visível por alguns segundos antes da passagem luminosa.
-        // Clarão curto na abertura; o rosto aparece assim que o brilho desaparece.
-        // O clarão único é sincronizado com o vídeo pronto, evitando pausa entre cenas.
         const video = document.getElementById('invitationTransitionVideo');
-        // Aguarda o vídeo novo carregar, inclusive em redes móveis mais lentas.
-        setTimeout(() => {
-          if (!video) { releaseRapunzelLantern(); return; }
-          let started = false;
-          const backdrop = document.getElementById('invitationBackdropVideo');
-          const startVideo = () => {
-            if (started || video.readyState < 2) return;
-            started = true;
-            modal?.classList.add('video-ready');
-            if (wash) { wash.classList.remove('bloom','reveal'); void wash.offsetWidth; wash.classList.add('bloom'); }
-            setTimeout(() => { modal?.classList.add('active'); cover?.classList.add('crossfade'); }, 520);
-            setTimeout(() => { cover?.classList.add('hidden'); }, 1750);
+        const backdrop = document.getElementById('invitationBackdropVideo');
+        startRapunzelMusic();
+        cover?.classList.add('opening');
+
+        // Android pode ignorar preload e bloquear play() fora do toque.
+        // Iniciamos o vídeo mudo no próprio clique e seguramos sua exibição
+        // até a transição luminosa, sem esperar 10 segundos por loadeddata.
+        let playbackPromise = null;
+        if (video) {
+          video.muted = true;
+          video.playsInline = true;
+          video.setAttribute('playsinline', '');
+          video.setAttribute('webkit-playsinline', '');
+          try {
             video.currentTime = 0;
-            if (backdrop) {
-              backdrop.currentTime = 0;
-              backdrop.play().catch(() => {});
-            }
-            video.play().catch(() => {
-              modal?.classList.remove('video-ready');
-              releaseRapunzelLantern();
-            });
-          };
-          if (video.readyState >= 2) startVideo();
-          else {
-            video.addEventListener('loadeddata', startVideo, {once:true});
-            video.load();
-            setTimeout(() => {
-              if (!started) {
-                video.removeEventListener('loadeddata', startVideo);
-                modal?.classList.add('active');
-                cover?.classList.add('crossfade');
-                setTimeout(() => cover?.classList.add('hidden'), 1200);
-                releaseRapunzelLantern();
-              }
-            }, 10000);
+            playbackPromise = video.play();
+            if (playbackPromise && playbackPromise.catch) playbackPromise.catch(() => {});
+          } catch (_) {}
+        }
+
+        setTimeout(() => {
+          // Um único clarão conecta o envelope diretamente à segunda cena.
+          if (wash) {
+            wash.classList.remove('bloom', 'reveal');
+            void wash.offsetWidth;
+            wash.classList.add('bloom');
           }
-        }, 4600);
+          if (video) {
+            modal?.classList.add('video-ready');
+            // Recomeça do início ao revelar a animação.
+            try { video.currentTime = 0; } catch (_) {}
+            const p = video.play();
+            if (p && p.catch) p.catch(() => {
+              // Se Android bloquear a reprodução, libera o convite em vez de travar.
+              setTimeout(enterInvitation, 1800);
+            });
+            // O vídeo de fundo é opcional: não deve bloquear a cena principal.
+            if (backdrop) {
+              backdrop.muted = true;
+              const bgPlay = backdrop.play();
+              if (bgPlay && bgPlay.catch) bgPlay.catch(() => {});
+            }
+          }
+          setTimeout(() => {
+            modal?.classList.add('active');
+            cover?.classList.add('crossfade');
+          }, 520);
+          setTimeout(() => cover?.classList.add('hidden'), 1750);
+          if (!video) setTimeout(enterInvitation, 2200);
+        }, 3200);
       }
 
       function enterInvitation() {
@@ -1579,15 +1586,7 @@
         if (transitionVideo) {
           transitionVideo.addEventListener('loadeddata', () => transitionModal?.classList.add('video-ready'));
           transitionVideo.addEventListener('error', () => transitionModal?.classList.remove('video-ready'));
-          // Até o novo arquivo ser enviado, mantém o vídeo anterior funcionando.
-          const source = transitionVideo.querySelector('source');
-          let fallbackUsed = false;
-          transitionVideo.addEventListener('error', () => {
-            if (fallbackUsed || !source) return;
-            fallbackUsed = true;
-            source.src = './ana-clara-transicao%20(2).mp4';
-            transitionVideo.load();
-          });
+          transitionVideo.addEventListener('error', () => { if (envelopeOpening) enterInvitation(); });
           transitionVideo.addEventListener('ended', enterInvitation);
         }
       }
