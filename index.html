@@ -988,6 +988,15 @@
     #rapunzelModal .invitation-transition-video {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#160d27;z-index:9;display:none;}
     #rapunzelModal.video-ready .invitation-transition-video {display:block;}
     #rapunzelModal.video-ready .scene-photo,#rapunzelModal.video-ready .photo-vignette,#rapunzelModal.video-ready .floating-lantern,#rapunzelModal.video-ready .scene-caption {display:none!important;}
+
+    /* Ajuste mobile: filme horizontal intacto, envolvido por luzes discretas. */
+    #rapunzelModal .scene-box {background:radial-gradient(ellipse at 50% 40%,#50345f 0%,#241437 52%,#100a22 100%)!important;}
+    #rapunzelModal .scene-box::after {content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.55;background-image:radial-gradient(circle at 12% 17%,#f6d8a3 0 2px,transparent 7px),radial-gradient(circle at 85% 27%,#e8c28e 0 3px,transparent 10px),radial-gradient(circle at 24% 78%,#f3d9a2 0 2px,transparent 9px),radial-gradient(circle at 79% 83%,#f4c887 0 2px,transparent 8px),radial-gradient(circle at 51% 8%,#d5abde 0 2px,transparent 9px);}
+    #rapunzelModal .invitation-transition-video {object-fit:contain!important;background:transparent!important;z-index:9;}
+    /* Não esconder o rosto com clarões amarelos nas passagens. */
+    .cinematic-wash,.cinematic-wash.bloom,.cinematic-wash.reveal {display:none!important;animation:none!important;}
+    #coverScreen.opening.crossfade {filter:none!important;opacity:0;transition:opacity 1.1s ease!important;}
+    @media(max-width:650px){#rapunzelModal .scene-box {height:100dvh!important;width:100vw!important;max-width:none!important;}#rapunzelModal .invitation-transition-video {width:100%;height:100%;}}
 </style>
 </head>
 <body>
@@ -1021,7 +1030,7 @@
   <section id="rapunzelModal" aria-label="Cena da Ana Clara com a lanterna">
     <div class="scene-box">
       <video id="invitationTransitionVideo" class="invitation-transition-video" playsinline muted preload="auto" aria-label="Animação das lanternas antes do convite">
-        <source src="./ana-clara-transicao%20(2).mp4" type="video/mp4">
+        <source src="./ana-clara-video-novo.mp4" type="video/mp4">
       </video>
       <img class="scene-photo" src="./cena-princesa-lanterna.png" onerror="this.onerror=null;this.src='./Luz%20de%20Ver%C3%A3o%20no%20Lago.png';" alt="Princesa de costas soltando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
@@ -1215,9 +1224,9 @@
         const wash = document.getElementById('cinematicWash');
         // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
         // A carta fica visível por alguns segundos antes da passagem luminosa.
-        setTimeout(() => { if (wash) wash.classList.add('bloom'); }, 3800);
+        // Clarão removido para preservar os rostos durante a transição.
         setTimeout(() => { if (modal) modal.classList.add('active'); }, 4400);
-        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
+        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4550);
         setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
         const video = document.getElementById('invitationTransitionVideo');
         // Inicia junto com a entrada da cena, após a animação completa do envelope.
@@ -1242,17 +1251,17 @@
         const modal = document.getElementById('rapunzelModal');
         if (cover) cover.classList.add('hidden');
         const wash = document.getElementById('cinematicWash');
-        if (wash) { wash.classList.remove('bloom'); void wash.offsetWidth; wash.classList.add('reveal'); }
+        // Transição direta e suave, sem luz amarela sobre o vídeo.
         setTimeout(() => {
           document.body.classList.add('invite-emerging');
           if (modal) modal.classList.add('leaving');
           window.scrollTo(0, 0);
-        }, 650);
+        }, 100);
         setTimeout(() => {
           if (modal) { modal.classList.remove('active'); modal.classList.remove('leaving'); }
           document.body.classList.remove('invite-emerging');
           if (wash) wash.classList.remove('reveal');
-        }, 2950);
+        }, 2200);
       }
 
       const bgCanvas = document.getElementById('lanternCanvas');
@@ -1518,6 +1527,15 @@
         if (transitionVideo) {
           transitionVideo.addEventListener('loadeddata', () => transitionModal?.classList.add('video-ready'));
           transitionVideo.addEventListener('error', () => transitionModal?.classList.remove('video-ready'));
+          // Até o novo arquivo ser enviado, mantém o vídeo anterior funcionando.
+          const source = transitionVideo.querySelector('source');
+          let fallbackUsed = false;
+          transitionVideo.addEventListener('error', () => {
+            if (fallbackUsed || !source) return;
+            fallbackUsed = true;
+            source.src = './ana-clara-transicao%20(2).mp4';
+            transitionVideo.load();
+          });
           transitionVideo.addEventListener('ended', enterInvitation);
         }
       }
