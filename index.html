@@ -1020,6 +1020,9 @@
     .cinematic-wash.bloom {animation:shortFlash .9s ease-in-out forwards!important;}
     .cinematic-wash.reveal {animation:shortFlash .95s ease-in-out forwards!important;}
     @keyframes shortFlash {0%{opacity:0}35%{opacity:.9}100%{opacity:0}}
+    /* A abertura mantém o brilho enquanto as cenas se cruzam, sem esconder o vídeo. */
+    .cinematic-wash.bloom {animation:openingFlash 1.9s ease-in-out forwards!important;}
+    @keyframes openingFlash {0%{opacity:0}25%{opacity:.93}55%{opacity:.85}100%{opacity:0}}
     #coverScreen.opening.crossfade {filter:none!important;opacity:0;transition:opacity 1s ease!important;}
     @media(max-width:650px) {
       #rapunzelModal .scene-box {height:100dvh!important;width:100vw!important;max-width:none!important;}
@@ -1107,7 +1110,7 @@
 
     <div class="card">
       <h3 class="section-title">Local do Evento</h3>
-      <p id="venueName" style="font-weight: 600;">Mansão Zurich</p>
+      <p id="venueName" style="font-weight: 600;">Mansão Zurique</p>
       <p id="venueAddress" class="venue-address">R. do Acre, 255 - Mooca, São Paulo - SP, 03181-100</p>
       <div class="btn-group">
         <a id="googleMapsLink" href="https://www.google.com/maps/search/?api=1&query=R.+do+Acre%2C+255+-+Mooca%2C+S%C3%A3o+Paulo+-+SP%2C+03181-100" target="_blank" rel="noopener noreferrer" class="btn-map">Google Maps</a>
@@ -1136,7 +1139,7 @@
   <script>
     (function () {
       const EVENT_CONFIG = {
-        venueName: 'Mansão Zurich',
+        venueName: 'Mansão Zurique',
         address: 'R. do Acre, 255 - Mooca, São Paulo - SP, 03181-100',
         dateIso: '2027-01-10T19:00:00-03:00'
       };
@@ -1256,9 +1259,9 @@
         // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
         // A carta fica visível por alguns segundos antes da passagem luminosa.
         // Clarão curto na abertura; o rosto aparece assim que o brilho desaparece.
-        setTimeout(() => { if (wash) { wash.classList.remove('reveal'); wash.classList.add('bloom'); } }, 4050);
-        setTimeout(() => { if (modal) modal.classList.add('active'); }, 4400);
-        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4450);
+        setTimeout(() => { if (wash) { wash.classList.remove('reveal'); wash.classList.add('bloom'); } }, 3900);
+        setTimeout(() => { if (modal) modal.classList.add('active'); }, 4600);
+        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
         setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
         const video = document.getElementById('invitationTransitionVideo');
         // Aguarda o vídeo novo carregar, inclusive em redes móveis mais lentas.
@@ -1288,7 +1291,7 @@
               if (!started) { video.removeEventListener('loadeddata', startVideo); releaseRapunzelLantern(); }
             }, 10000);
           }
-        }, 4400);
+        }, 4600);
       }
 
       function enterInvitation() {
