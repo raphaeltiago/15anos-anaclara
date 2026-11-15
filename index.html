@@ -1035,21 +1035,15 @@
     #coverScreen.opening .envelope-intro {opacity:0;transform:scale(1.06);transition:opacity 1s ease,transform 1s ease;}
     @keyframes sealHalo {0%,100%{opacity:.65;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
 
-    /* Mobile: enquadramento vertical com menos ampliação e bordas estendidas pelo próprio vídeo. */
+    /* Mobile: zoom vertical original aprovado, preenchendo toda a tela. */
     @media (max-width: 650px) and (orientation: portrait) {
       #rapunzelModal .scene-box {position:absolute!important;inset:0!important;width:100vw!important;height:100dvh!important;overflow:hidden!important;}
-      #rapunzelModal.video-ready .invitation-backdrop-video {
-        display:block!important;position:absolute!important;inset:-8%!important;
-        width:116%!important;height:116%!important;object-fit:cover!important;
-        filter:blur(28px) brightness(.68) saturate(1.18)!important;
-        transform:scale(1.06)!important;z-index:3!important;
-      }
+      #rapunzelModal .invitation-backdrop-video {display:none!important;}
+      #rapunzelModal.video-ready .invitation-backdrop-video {display:none!important;}
       #rapunzelModal .invitation-transition-video {
         position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
         object-fit:cover!important;object-position:center center!important;
-        transform:scale(.88)!important;transform-origin:center!important;
-        -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);
-        mask-image:linear-gradient(to bottom,transparent 0%,#000 10%,#000 90%,transparent 100%);
+        transform:none!important;-webkit-mask-image:none!important;mask-image:none!important;
         max-width:none!important;max-height:none!important;background:transparent!important;
       }
     }
