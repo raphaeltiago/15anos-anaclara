@@ -1020,6 +1020,11 @@
     .cinematic-wash.bloom {animation:shortFlash .9s ease-in-out forwards!important;}
     .cinematic-wash.reveal {animation:shortFlash .95s ease-in-out forwards!important;}
     @keyframes shortFlash {0%{opacity:0}35%{opacity:.9}100%{opacity:0}}
+    /* Envelope abre mais devagar, mas o clarão começa sem espera longa. */
+    #coverScreen .envelope-flap {transition-duration:1.6s!important;}
+    #coverScreen .envelope-letter {transition:transform 1.65s ease .18s!important;}
+    #coverScreen.opening .opening-glow {animation:envelopeFlash 1.6s .65s forwards!important;}
+    #coverScreen.opening .envelope-intro {transition-delay:.65s!important;}
     /* A abertura mantém o brilho enquanto as cenas se cruzam, sem esconder o vídeo. */
     .cinematic-wash.bloom {animation:openingFlash 1.9s ease-in-out forwards!important;}
     @keyframes openingFlash {0%{opacity:0}25%{opacity:.93}55%{opacity:.85}100%{opacity:0}}
@@ -1259,10 +1264,10 @@
         // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
         // A carta fica visível por alguns segundos antes da passagem luminosa.
         // Clarão curto na abertura; o rosto aparece assim que o brilho desaparece.
-        setTimeout(() => { if (wash) { wash.classList.remove('reveal'); wash.classList.add('bloom'); } }, 3900);
-        setTimeout(() => { if (modal) modal.classList.add('active'); }, 4600);
-        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
-        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
+        setTimeout(() => { if (wash) { wash.classList.remove('reveal'); wash.classList.add('bloom'); } }, 1950);
+        setTimeout(() => { if (modal) modal.classList.add('active'); }, 2600);
+        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 2650);
+        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 3900);
         const video = document.getElementById('invitationTransitionVideo');
         // Aguarda o vídeo novo carregar, inclusive em redes móveis mais lentas.
         setTimeout(() => {
@@ -1291,7 +1296,7 @@
               if (!started) { video.removeEventListener('loadeddata', startVideo); releaseRapunzelLantern(); }
             }, 10000);
           }
-        }, 4600);
+        }, 2600);
       }
 
       function enterInvitation() {
