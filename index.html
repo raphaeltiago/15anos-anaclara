@@ -1020,6 +1020,8 @@
     .cinematic-wash.bloom {animation:shortFlash .9s ease-in-out forwards!important;}
     .cinematic-wash.reveal {animation:shortFlash .95s ease-in-out forwards!important;}
     @keyframes shortFlash {0%{opacity:0}35%{opacity:.9}100%{opacity:0}}
+    /* Um único clarão: desativa o segundo brilho interno do envelope. */
+    #coverScreen.opening .opening-glow {animation:none!important;opacity:0!important;}
     /* A abertura mantém o brilho enquanto as cenas se cruzam, sem esconder o vídeo. */
     .cinematic-wash.bloom {animation:openingFlash 1.9s ease-in-out forwards!important;}
     @keyframes openingFlash {0%{opacity:0}25%{opacity:.93}55%{opacity:.85}100%{opacity:0}}
@@ -1259,10 +1261,7 @@
         // A luz do envelope cobre a mudança de cenário; as duas cenas se sobrepõem.
         // A carta fica visível por alguns segundos antes da passagem luminosa.
         // Clarão curto na abertura; o rosto aparece assim que o brilho desaparece.
-        setTimeout(() => { if (wash) { wash.classList.remove('reveal'); wash.classList.add('bloom'); } }, 3900);
-        setTimeout(() => { if (modal) modal.classList.add('active'); }, 4600);
-        setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
-        setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
+        // O clarão único é sincronizado com o vídeo pronto, evitando pausa entre cenas.
         const video = document.getElementById('invitationTransitionVideo');
         // Aguarda o vídeo novo carregar, inclusive em redes móveis mais lentas.
         setTimeout(() => {
@@ -1273,6 +1272,9 @@
             if (started || video.readyState < 2) return;
             started = true;
             modal?.classList.add('video-ready');
+            if (wash) { wash.classList.remove('bloom','reveal'); void wash.offsetWidth; wash.classList.add('bloom'); }
+            setTimeout(() => { modal?.classList.add('active'); cover?.classList.add('crossfade'); }, 520);
+            setTimeout(() => { cover?.classList.add('hidden'); }, 1750);
             video.currentTime = 0;
             if (backdrop) {
               backdrop.currentTime = 0;
@@ -1288,7 +1290,13 @@
             video.addEventListener('loadeddata', startVideo, {once:true});
             video.load();
             setTimeout(() => {
-              if (!started) { video.removeEventListener('loadeddata', startVideo); releaseRapunzelLantern(); }
+              if (!started) {
+                video.removeEventListener('loadeddata', startVideo);
+                modal?.classList.add('active');
+                cover?.classList.add('crossfade');
+                setTimeout(() => cover?.classList.add('hidden'), 1200);
+                releaseRapunzelLantern();
+              }
             }, 10000);
           }
         }, 4600);
