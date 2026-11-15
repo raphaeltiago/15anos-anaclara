@@ -1047,6 +1047,12 @@
         max-width:none!important;max-height:none!important;background:transparent!important;
       }
     }
+    /* Presentes */
+    .gift-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0 20px;}
+    .gift-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;min-height:88px;padding:12px 7px;border:1px solid rgba(236,193,112,.45);border-radius:13px;background:rgba(255,215,137,.07);font-size:1.25rem;}
+    .gift-item span{font-size:.88rem;line-height:1.35;}
+    .gift-pix{text-align:center;padding:18px 12px;border-top:1px solid rgba(236,193,112,.35);}
+    #copyGiftPix:disabled{opacity:.5;cursor:not-allowed;}
 </style>
 </head>
 <body>
@@ -1148,6 +1154,24 @@
       <div class="btn-group">
         <a id="googleMapsLink" href="https://www.google.com/maps/search/?api=1&query=R.+do+Acre%2C+255+-+Mooca%2C+S%C3%A3o+Paulo+-+SP%2C+03181-100" target="_blank" rel="noopener noreferrer" class="btn-map">Google Maps</a>
         <a id="wazeLink" href="https://waze.com/ul?q=R.%20do%20Acre%2C%20255%20-%20Mooca%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2003181-100" target="_blank" rel="noopener noreferrer" class="btn-map">Waze</a>
+      </div>
+    </div>
+
+    <div class="card" id="presentes">
+      <h3 class="section-title">Sugestões de Presentes ✨</h3>
+      <p style="line-height:1.7;margin-bottom:16px;">Sua presença é o nosso maior presente! Mas, se desejar presentear a Ana Clara, aqui vão algumas sugestões escolhidas com carinho:</p>
+      <div class="gift-grid">
+        <div class="gift-item">🌸 <span>Perfumes</span></div>
+        <div class="gift-item">🧴 <span>Hidratantes</span></div>
+        <div class="gift-item">💄 <span>Maquiagens</span></div>
+        <div class="gift-item">✨ <span>Produtos para cabelo</span></div>
+        <div class="gift-item">👗 <span>Roupas <strong>tamanho M</strong></span></div>
+        <div class="gift-item">👠 <span>Sapatos <strong>número 40</strong></span></div>
+      </div>
+      <div class="gift-pix">
+        <p style="margin:0 0 12px;line-height:1.6;">Prefere presentear com Pix?</p>
+        <button type="button" id="copyGiftPix" class="btn-primary" disabled>Copiar chave Pix</button>
+        <p id="giftPixFeedback" role="status" aria-live="polite" style="font-size:.83rem;margin-top:10px;opacity:.85;">Chave Pix será disponibilizada em breve.</p>
       </div>
     </div>
 
@@ -1620,6 +1644,34 @@
           transitionVideo.addEventListener('error', () => { if (envelopeOpening) enterInvitation(); });
           transitionVideo.addEventListener('ended', enterInvitation);
         }
+      }
+
+      // Preencha com a chave Pix autorizada para ativar o botão de cópia.
+      const GIFT_PIX_KEY = '';
+      const giftPixBtn = document.getElementById('copyGiftPix');
+      const giftPixFeedback = document.getElementById('giftPixFeedback');
+      if (giftPixBtn && GIFT_PIX_KEY.trim()) {
+        giftPixBtn.disabled = false;
+        giftPixFeedback.textContent = 'Toque no botão para copiar a chave.';
+        giftPixBtn.addEventListener('click', async () => {
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(GIFT_PIX_KEY);
+            } else {
+              const input = document.createElement('textarea');
+              input.value = GIFT_PIX_KEY;
+              input.style.position = 'fixed';
+              input.style.opacity = '0';
+              document.body.appendChild(input);
+              input.select();
+              if (!document.execCommand('copy')) throw new Error('Falha ao copiar');
+              input.remove();
+            }
+            giftPixFeedback.textContent = 'Chave Pix copiada! 💜';
+          } catch (_) {
+            giftPixFeedback.textContent = 'Não foi possível copiar automaticamente. Tente novamente.';
+          }
+        });
       }
 
       function boot() {
