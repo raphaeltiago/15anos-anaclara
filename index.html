@@ -1058,10 +1058,10 @@
   <!-- Cena fotográfica da Ana Clara com a lanterna -->
   <section id="rapunzelModal" aria-label="Cena da Ana Clara com a lanterna">
     <div class="scene-box">
-      <video id="invitationBackdropVideo" class="invitation-backdrop-video" playsinline muted preload="auto" aria-hidden="true" tabindex="-1"><source src="./ana-clara-video-final.mp4" type="video/mp4"></video>
+      <video id="invitationBackdropVideo" class="invitation-backdrop-video" playsinline muted preload="auto" aria-hidden="true" tabindex="-1"><source src="./ana-clara-video-final.mp4?v=20261115b" type="video/mp4"></video>
       <div class="invitation-lights" aria-hidden="true"></div>
       <video id="invitationTransitionVideo" class="invitation-transition-video" playsinline muted preload="auto" aria-label="Animação das lanternas antes do convite">
-        <source src="./ana-clara-video-final.mp4" type="video/mp4">
+        <source src="./ana-clara-video-final.mp4?v=20261115b" type="video/mp4">
       </video>
       <img class="scene-photo" src="./cena-princesa-lanterna.png" onerror="this.onerror=null;this.src='./Luz%20de%20Ver%C3%A3o%20no%20Lago.png';" alt="Princesa de costas soltando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
@@ -1261,19 +1261,32 @@
         setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4450);
         setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
         const video = document.getElementById('invitationTransitionVideo');
-        // Inicia junto com a entrada da cena, após a animação completa do envelope.
+        // Aguarda o vídeo novo carregar, inclusive em redes móveis mais lentas.
         setTimeout(() => {
-          if (video && video.readyState >= 2) {
+          if (!video) { releaseRapunzelLantern(); return; }
+          let started = false;
+          const backdrop = document.getElementById('invitationBackdropVideo');
+          const startVideo = () => {
+            if (started || video.readyState < 2) return;
+            started = true;
+            modal?.classList.add('video-ready');
             video.currentTime = 0;
-            const backdrop = document.getElementById('invitationBackdropVideo');
-            if (backdrop) { backdrop.currentTime = 0; backdrop.play().catch(() => {}); }
+            if (backdrop) {
+              backdrop.currentTime = 0;
+              backdrop.play().catch(() => {});
+            }
             video.play().catch(() => {
               modal?.classList.remove('video-ready');
               releaseRapunzelLantern();
             });
-          } else {
-            // Enquanto o MP4 não estiver no repositório, mantém a animação anterior.
-            setTimeout(releaseRapunzelLantern, 2950);
+          };
+          if (video.readyState >= 2) startVideo();
+          else {
+            video.addEventListener('loadeddata', startVideo, {once:true});
+            video.load();
+            setTimeout(() => {
+              if (!started) { video.removeEventListener('loadeddata', startVideo); releaseRapunzelLantern(); }
+            }, 10000);
           }
         }, 4400);
       }
