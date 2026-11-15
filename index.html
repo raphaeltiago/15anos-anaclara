@@ -1200,40 +1200,33 @@
         osc.stop(now + duration + 0.02);
       }
 
+      // Música enviada ao repositório pela família; começa após interação com o envelope.
+      const invitationMusic = new Audio("./Vejo%20enfim%20a%20Luz%20Brilhar%20(%20I%20See%20the%20Light)%20-%20%20Filme%20Enrolados%20Disney%20-%20Instrumental_Arcanjo%20Orquestra%20e%20Coral_DaZikdDe7Mw.mp3");
+      invitationMusic.loop = true;
+      invitationMusic.preload = 'auto';
+      invitationMusic.volume = 0.65;
+
+      function updateMusicButton() {
+        const btn = document.getElementById('musicToggleBtn');
+        if (btn) btn.textContent = invitationMusic.paused ? '♪ Música: Off' : '♪ Música: On';
+      }
+
       function startRapunzelMusic() {
-        try {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (!AudioCtx) return;
-          if (!audioCtx) audioCtx = new AudioCtx();
-          if (audioCtx.state === 'suspended') audioCtx.resume();
-          if (musicPlaying) return;
-
-          musicPlaying = true;
-          const btn = document.getElementById('musicToggleBtn');
-          if (btn) btn.textContent = '♪ Música: On';
-
-          function step() {
-            if (!musicPlaying) return;
-            const note = rapunzelMelody[noteIndex % rapunzelMelody.length];
-            playNote(note.freq, note.dur);
-            noteIndex += 1;
-            melodyTimer = setTimeout(step, note.dur * 950);
-          }
-          step();
-        } catch (_) {}
+        invitationMusic.play().then(updateMusicButton).catch(updateMusicButton);
       }
 
       function stopRapunzelMusic() {
-        musicPlaying = false;
-        if (melodyTimer) clearTimeout(melodyTimer);
-        const btn = document.getElementById('musicToggleBtn');
-        if (btn) btn.textContent = '♪ Música: Off';
+        invitationMusic.pause();
+        updateMusicButton();
       }
 
       function toggleRapunzelMusic() {
-        if (musicPlaying) stopRapunzelMusic();
-        else startRapunzelMusic();
+        if (invitationMusic.paused) startRapunzelMusic();
+        else stopRapunzelMusic();
       }
+
+      invitationMusic.addEventListener('play', updateMusicButton);
+      invitationMusic.addEventListener('pause', updateMusicButton);
 
       let envelopeOpening = false;
       // Evita restaurar uma animação pela metade ao retornar pelo histórico do navegador.
