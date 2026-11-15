@@ -1031,6 +1031,19 @@
       #rapunzelModal .invitation-transition-video {width:100%;height:100%;}
     }
     @media(prefers-reduced-motion:reduce){#rapunzelModal .invitation-lights{animation:none}}
+
+    /* Abertura com selo mágico: somente transform/opacity, compatível com Android. */
+    #coverScreen .magic-seal-button {position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;width:min(82vw,330px);min-height:260px;margin:12px auto 20px;border:0;background:transparent;color:#ffe9ac;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+    #coverScreen .magic-seal-halo {position:absolute;top:0;left:50%;width:205px;height:205px;margin-left:-102.5px;border-radius:50%;background:radial-gradient(circle,rgba(255,221,131,.4),rgba(251,197,91,.13) 47%,transparent 73%);animation:sealHalo 2.8s ease-in-out infinite;pointer-events:none;}
+    #coverScreen .magic-seal-disc {position:relative;display:grid;place-items:center;width:166px;height:166px;border-radius:50%;border:3px solid #fce6a6;box-shadow:0 0 0 7px rgba(220,168,67,.22),0 0 30px rgba(255,201,96,.65),inset 0 0 25px rgba(255,239,176,.5);background:radial-gradient(circle at 35% 30%,#fff0bc,#dfb458 53%,#94601f);transition:transform .9s ease,opacity .9s ease;pointer-events:none;}
+    #coverScreen .magic-seal-disc::after {content:"";position:absolute;inset:12px;border:1px solid rgba(255,247,206,.8);border-radius:50%;}
+    #coverScreen .magic-seal-sun {font-family:Georgia,serif;font-size:108px;line-height:1;color:#fff3c6;text-shadow:0 0 20px #fff2b0,0 0 32px #ffe6a1;}
+    #coverScreen .magic-seal-hint {position:relative;font:600 .74rem 'Cinzel',serif;letter-spacing:2px;text-shadow:0 0 14px rgba(255,209,112,.7);pointer-events:none;}
+    #coverScreen.opening .magic-seal-disc {transform:scale(1.8) rotate(35deg);opacity:0;}
+    #coverScreen.opening .magic-seal-halo {animation:none;transform:scale(2.4);opacity:0;transition:transform 1s ease,opacity 1s ease;}
+    #coverScreen.opening .magic-seal-hint {opacity:0;transition:opacity .3s ease;}
+    #coverScreen.opening .envelope-intro {opacity:0;transform:scale(1.06);transition:opacity 1s ease,transform 1s ease;}
+    @keyframes sealHalo {0%,100%{opacity:.65;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
 </style>
 </head>
 <body>
@@ -1051,9 +1064,10 @@
       <p class="envelope-label">Uma noite encantada espera por você</p>
       <h1 class="envelope-title">Ana Clara</h1>
       <p class="envelope-subtitle">MEUS 15 ANOS</p>
-      <button class="envelope-button" type="button" id="sunSealBtn" aria-label="Abrir o envelope do convite">
-        <span class="envelope-back"></span><span class="envelope-letter">Um convite especial para você ✦</span>
-        <span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">✦</span>
+      <button class="magic-seal-button" type="button" id="sunSealBtn" aria-label="Toque para abrir o convite mágico">
+        <span class="magic-seal-halo" aria-hidden="true"></span>
+        <span class="magic-seal-disc" aria-hidden="true"><span class="magic-seal-sun">✺</span></span>
+        <span class="magic-seal-hint">TOQUE PARA ABRIR SEU CONVITE</span>
       </button>
 
     </div>
@@ -1299,7 +1313,7 @@
           }, 520);
           setTimeout(() => cover?.classList.add('hidden'), 1750);
           if (!video) setTimeout(enterInvitation, 2200);
-        }, 3200);
+        }, 1050);
       }
 
       function enterInvitation() {
