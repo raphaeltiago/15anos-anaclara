@@ -983,6 +983,11 @@
       #rapunzelModal.releasing .floating-lantern {animation:none!important;}
     }
 
+
+    /* Vídeo da transição fornecido pela família: sem efeitos artificiais sobre a cena. */
+    #rapunzelModal .invitation-transition-video {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#160d27;z-index:9;display:none;}
+    #rapunzelModal.video-ready .invitation-transition-video {display:block;}
+    #rapunzelModal.video-ready .scene-photo,#rapunzelModal.video-ready .photo-vignette,#rapunzelModal.video-ready .floating-lantern,#rapunzelModal.video-ready .scene-caption {display:none!important;}
 </style>
 </head>
 <body>
@@ -1015,6 +1020,9 @@
   <!-- Cena fotográfica da Ana Clara com a lanterna -->
   <section id="rapunzelModal" aria-label="Cena da Ana Clara com a lanterna">
     <div class="scene-box">
+      <video id="invitationTransitionVideo" class="invitation-transition-video" playsinline muted preload="auto" aria-label="Animação das lanternas antes do convite">
+        <source src="./ana-clara-transicao.mp4" type="video/mp4">
+      </video>
       <img class="scene-photo" src="./cena-princesa-lanterna.png" onerror="this.onerror=null;this.src='./Luz%20de%20Ver%C3%A3o%20no%20Lago.png';" alt="Princesa de costas soltando uma lanterna dourada diante de um lago ao entardecer">
       <div class="photo-vignette" aria-hidden="true"></div>
       <div class="floating-lantern" aria-hidden="true"></div>
@@ -1211,7 +1219,17 @@
         setTimeout(() => { if (modal) modal.classList.add('active'); }, 4400);
         setTimeout(() => { if (cover) cover.classList.add('crossfade'); }, 4650);
         setTimeout(() => { if (cover) cover.classList.add('hidden'); }, 6800);
-        setTimeout(releaseRapunzelLantern, 7350);
+        const video = document.getElementById('invitationTransitionVideo');
+        if (video && video.readyState >= 2) {
+          video.currentTime = 0;
+          video.play().catch(() => {
+            modal?.classList.remove('video-ready');
+            setTimeout(releaseRapunzelLantern, 7350);
+          });
+        } else {
+          // Enquanto o MP4 ainda não foi enviado ao repositório, preserva a cena anterior.
+          setTimeout(releaseRapunzelLantern, 7350);
+        }
       }
 
       function enterInvitation() {
@@ -1492,6 +1510,13 @@
         document.getElementById('sunSealBtn').addEventListener('click', openRapunzelScene);
 
         document.getElementById('releaseBtn').addEventListener('click', releaseRapunzelLantern);
+        const transitionVideo = document.getElementById('invitationTransitionVideo');
+        const transitionModal = document.getElementById('rapunzelModal');
+        if (transitionVideo) {
+          transitionVideo.addEventListener('loadeddata', () => transitionModal?.classList.add('video-ready'));
+          transitionVideo.addEventListener('error', () => transitionModal?.classList.remove('video-ready'));
+          transitionVideo.addEventListener('ended', enterInvitation);
+        }
       }
 
       function boot() {
