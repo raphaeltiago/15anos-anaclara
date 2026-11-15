@@ -1034,6 +1034,17 @@
     #coverScreen.opening .magic-seal-hint {opacity:0;transition:opacity .3s ease;}
     #coverScreen.opening .envelope-intro {opacity:0;transform:scale(1.06);transition:opacity 1s ease,transform 1s ease;}
     @keyframes sealHalo {0%,100%{opacity:.65;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
+
+    /* Mobile: vídeo em tela cheia vertical, sem faixas horizontais.
+       object-fit:cover preenche 9:16 recortando as bordas do vídeo horizontal. */
+    @media (max-width: 650px) and (orientation: portrait) {
+      #rapunzelModal .scene-box {position:absolute!important;inset:0!important;width:100vw!important;height:100dvh!important;overflow:hidden!important;}
+      #rapunzelModal .invitation-transition-video {
+        position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+        object-fit:cover!important;object-position:center center!important;
+        max-width:none!important;max-height:none!important;background:transparent!important;
+      }
+    }
 </style>
 </head>
 <body>
